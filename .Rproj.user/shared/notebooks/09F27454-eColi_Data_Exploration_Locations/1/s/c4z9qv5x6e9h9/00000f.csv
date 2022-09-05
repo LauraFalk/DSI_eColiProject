@@ -1,9 +1,0 @@
-"0","RawFileName <- ""EPA_PortalQuery_Appended_SODN.csv""
-
-#Current file uses points lassoed in arcmap. It uses any sampling locations north of inputs from both the Nogales WWTP and Sonoita Creek in case either of these are point sources of e. Coli.
-LocationFileName <- ""EPA_PortalQuery_Locations_Appended_SODN.csv""
-ecoli_data <- read.csv(RawFileName)
-"
-"2","Warning: cannot open file 'EPA_PortalQuery_Appended_SODN.csv': No such file or directory"
-"2","Error in file(file, ""rt"") : cannot open the connection
-"

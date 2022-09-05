@@ -1,7 +1,0 @@
-"0","#setwd(""C:/Users/Laura/Desktop/DSI_Project/Data/"")"
-"0","RawFileName <- ""data/EPA_PortalQuery_Appended_SODN.csv"""
-"0",""
-"0","#Current file uses points lassoed in arcmap. It uses any sampling locations north of inputs from both the Nogales WWTP and Sonoita Creek in case either of these are point sources of e. Coli."
-"0","LocationFileName <- ""data/EPA_PortalQuery_Locations_Appended_SODN.csv"""
-"0","ecoli_data <- read.csv(RawFileName)"
-"0","Locations <- read.csv(LocationFileName)"
