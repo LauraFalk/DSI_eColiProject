@@ -1,0 +1,23 @@
+---
+title: "eColi_Data_Exploration_R1"
+author: "Laura Palacios"
+date: '2022-08-29'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+
+opts_chunk$set(echo = TRUE)
+```
+
+###ONLY RUN THIS ONCE.
+This is the data pull for USGS data. It is many years and takes lots of time to grab all 300k records.
+```{r}
+site_id <- '09481740'
+tz="America/Phoenix"
+
+#creates table in R
+USGS <- readNWISuv(site_id,c('00060','00065'),startDate,endDate, tz)
+```
+
