@@ -19,14 +19,16 @@ library(ggplot2)
 Read in input file
 note: this will have one extra variable if csv is exported and re-imported because column 1 (ID) will be added to file.
 ```{r}
-eColi_FileName <- "Data/Processed/ecoli_ForAnalysis.csv"
-ecoli_Flow_Merge <- read.csv(eColi_FileName)
+#Part of a project, this is not necessary if previous files have been run.
+#eColi_FileName <- "Data/Processed/ecoli_ForAnalysis.csv"
+#ecoli_Flow_Merge <- read.csv(eColi_FileName)
 
 ```
 
 read in USGS file
 ```{r}
-USGS <- read.csv("Data/Raw/USGS_09481740.csv")
+#Part of a project, this is not necessary if previous files have been run.
+#USGS <- read.csv("Data/Raw/USGS_09481740.csv")
 ```
 
 Create Date/Time column in e coli file.
@@ -56,13 +58,16 @@ create merged file for graphs and tables
 Outputtest<-
   merge(x = ecoli_Flow_Merge[ , c("DateTime1","X")], 
         y = USGS[ , c("DateTime2", "Discharge_CFS", "USGS_Depth_in")], 
-        by.x='DateTime1', by.y = 'DateTime2')#, all.x=TRUE) 
+        by.x='DateTime1', by.y = 'DateTime2', all.x=TRUE) 
 ```
 
-create plot
 ```{r}
-  
+#Check this merge
+library(dplyr)
+test <- Outputtest %>%
+  filter(Discharge_CFS == NULL)
 ```
+
 
 
 

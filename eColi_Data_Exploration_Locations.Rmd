@@ -64,8 +64,8 @@ ecoli_data_9223b_date <- ecoli_data_9223b[ecoli_data_9223b$DateAsDate >= "2009-0
 
 
 Merge the files based on monitoring location identifier
+# this will decrease the number of rows in the dataset because it excludes measurements outside of the study range (namely the sonoita creek data)
 ```{r}
 ecoli_ForAnalysis <- merge(ecoli_data_9223b_date, Locations, by = c("MonitoringLocationIdentifier"))
 
-write.csv(ecoli_ForAnalysis,"C:/Users/Laura/Desktop/DSI_DataProcessing/Data/Processed/ecoli_ForAnalysis.csv")
 ```
