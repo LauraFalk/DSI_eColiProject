@@ -1,5 +1,5 @@
 ---
-title: "eColi_Data_Exploration_R1"
+title: "eColi_Data_Exploration_USGS_File_Processing"
 author: "Laura Palacios"
 date: '2022-08-29'
 output: html_document
@@ -7,13 +7,14 @@ output: html_document
 
 ```{r setup, include=FALSE}
 library(knitr)
+library(lubridate)
 library(tidyverse)
 library(zoo)
 opts_chunk$set(echo = TRUE)
 ```
 
 ###ONLY RUN THIS ONCE.
-This is the data pull for USGS data. It is many years and takes lots of time to grab all 300k records. USe CSV for data beterrn 7/1/2009 and 8/30/2022
+This is the data pull for USGS data. It is many years and takes lots of time to grab all 300k records. Use CSV for data between 7/1/2009 and 8/30/2022
 ```{r}
 site_id <- '09481740'
 startDate = "2009-07-01"
@@ -37,6 +38,40 @@ USGS_Standardized$DateTime2 <-as.POSIXct(format(USGS_Standardized$DateTime2, for
 
 ```
 
+Something is wrong here. Why are there duplicate datetimes
+```{r}
+USGS_Standardized %>% group_by(DateTime2) %>% summarise(n=sum(n())) %>% filter(n>1)
+```
+
+Oh, because I rounded.
+```{r}
+# remove the pre-rounding dateTime column
+USGS_Standardized_RmDupls <- USGS_Standardized %>%
+  subset(select = -c(dateTime)) 
+
+# This shows any duplicate dates. There are a few because the data was not collected on the standard 15-minute interval. The separate values were rounded to the same one.
+USGS_Standardized_RmDupls %>% group_by(DateTime2) %>% summarise(n=sum(n())) %>% filter(n>1)
+
+# This summarizes the flow column by the rounded DateTime
+USGS_Standardized_RmDupls <- USGS_Standardized_RmDupls %>% group_by(DateTime2) %>% summarise(mean(X_00060_00000))
+
+# Merge the rounded data back in and rename the column name to something more useful.
+USGS_RmDupl<- merge(x=USGS_Standardized,y=USGS_Standardized_RmDupls, by="DateTime2",all.x=TRUE, all.y = FALSE)
+setnames(USGS_RmDupl,old=c("mean(X_00060_00000)"),new=c("Discharge_CFS"))
+
+#Remove the pre-averaging flow column
+USGS_RmDupl <- USGS_RmDupl %>%
+  subset(select = -c(X_00060_00000))
+
+# Removing duplicates from the fixed times and fixed cfs
+USGS_RmDupl<- USGS_RmDupl %>% 
+ distinct(DateTime2, Discharge_CFS, .keep_all = TRUE)
+
+#Re-check
+USGS_RmDupl %>% group_by(DateTime2) %>% summarise(n=sum(n())) %>% filter(n>1)
+
+```
+
 There are missing timestamps. This will create a full time series to include no data indicators.
 ```{r}
 # Create the time series, formatted as posixt
@@ -45,15 +80,17 @@ colnames(TimeSeries)[1] = "DateTime"
 TimeSeries$DateTime2 <-as.POSIXct(format(TimeSeries$DateTime, format = '%Y-%m-%d %H:%M'), tz = tz)
 
 #Join data with time series, sort by DateTime2
-USGS_TimeSeries <- right_join(USGS_Standardized, TimeSeries)
-USGS_TimeSeries <-USGS_TimeSeries[order(USGS_TimeSeries$DateTime2),]
+# could also use left_join here. Issues were from duplicate values from the rounding merge.
+USGS_TimeSeries <- merge(x=TimeSeries,y=USGS_RmDupl,by="DateTime2",all.x=TRUE, all.y = FALSE)
+
 ```
 
+
 For data exploration: this tests to see how many nulls are present in the current dataset.
-note 9/5/2022: 40578
+note 9/5/2022: 40544
 ```{r}
 count(USGS_TimeSeries %>%
- filter(is.na(X_00060_00000)))
+ filter(is.na(Discharge_CFS)))
 ```
 
 I think I should be able to fill some of the nulls by taking the average of the two surrounding values. How many does this account for?
@@ -63,12 +100,13 @@ USGS_TimeSeries$date <- as_date(USGS_TimeSeries$DateTime2)
 USGS_TimeSeries$count <- 1
 
 TimeFlag <- USGS_TimeSeries %>%
-  filter(!is.na(X_00060_00000)) %>%
+  filter(!is.na(Discharge_CFS)) %>%
   group_by(date) %>%
   summarize(value = sum(count))
 
 USGS_TimeSeries <- right_join(TimeFlag, USGS_TimeSeries)
-colnames(USGS_TimeSeries)[2] = "CountUSGSbyDate"
+setnames(USGS_TimeSeries, "value", "CountUSGSbyDate")
+
 ```
 Start to fill NAs where applicable. This will fill in all data into a new column.
 ```{r}
@@ -76,14 +114,37 @@ USGS_TimeSeries_Fill <-
   USGS_TimeSeries %>%
   filter(CountUSGSbyDate>88)
 
-USGS_TimeSeries_Fill$Filled <-  data.frame(na.approx(USGS_TimeSeries_Fill$X_00060_00000, rule = 2))
+USGS_TimeSeries_Fill$Filled <-  na.approx(USGS_TimeSeries_Fill$Discharge_CFS, rule = 2)
 
-USGS_ForAnalysis <- inner_join(USGS_TimeSeries_Fill,USGS_TimeSeries)
+USGS_ForAnalysis <- right_join(USGS_TimeSeries_Fill,USGS_TimeSeries)
 
 ```
-Check how many nulls there are now that some of the data is filled. I'm not comfortable auto-filling (the majority) of the remaining values.But there is currently only 3159.
+Check how many nulls there are now that some of the data is filled. I'm not comfortable auto-filling (the majority) of the remaining values.
 ```{r}
-count(USGS_ForAnalysis %>%
- filter(is.na(X_00060_00000)))
+USGS_ForAnalysis2 <- USGS_ForAnalysis
+
+USGS_ForAnalysis2$Filled<- ifelse(is.na(USGS_ForAnalysis$Discharge_CFS) == TRUE,USGS_ForAnalysis$Filled,USGS_ForAnalysis$Discharge_CFS)
+
+count(USGS_ForAnalysis2 %>%
+ filter(is.na(Filled)))
+
+```
+
+```{r}
+USGS_ForAnalysis2 <-  USGS_ForAnalysis2 %>%
+  subset(select = -c(date, count, Discharge_CFS))
+
+setnames(USGS_ForAnalysis2,old=c("Filled"),new=c("Discharge_CFS"))
+```
+
+
+
+Remove prior files so that I don't get confused.
+```{r}
+remove(TimeFlag, TimeSeries, USGS_TimeSeries, USGS_Raw, USGS_Standardized, USGS_TimeSeries_Fill, USGS_ForAnalysis, USGS_RmDupl, USGS_RmDupls, USGS_Standardized_RmDupls, view)
+```
+
+```{r}
+write.csv(USGS_ForAnalysis2, "Data/Processed/USGS_ForAnalysis20220905.csv")
 ```
 
