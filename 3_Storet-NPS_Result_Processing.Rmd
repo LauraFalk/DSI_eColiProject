@@ -1,0 +1,75 @@
+---
+title: "Storet-NPS_Result_Processing"
+author: "Laura Palacios"
+date: '2022-09-06'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(janitor)
+library(knitr)
+library(tidyverse)
+```
+
+Run Step 2 code to create the ecoli_SampleLimit File.
+
+Remove columns that contain only null fields
+```{r}
+ecoli_Processing <-remove_empty(ecoli_SampleLimit, which = "cols")
+```
+
+Remove columns that contain only 1 entry
+```{r}
+ecoli_Processing <- keep(ecoli_Processing, ~n_distinct(.) > 1)
+```
+
+View the data. There are still columns I don't need.
+```{r}
+summary(ecoli_Processing)
+```
+
+Take out columns that don't have meaningful data. Numeric First
+```{r}
+ecoli_Processing <- ecoli_Processing %>%
+  subset(select = -c(OrganizationIdentifier.x, # data contained in another column
+                     ActivityDepthHeightMeasure.MeasureValue, # all 0 or NA
+                     ActivityDepthHeightMeasure.MeasureUnitCode, # associated column is being removed
+                     ActivityTopDepthHeightMeasure.MeasureValue, # all 0 or NA
+                     ActivityTopDepthHeightMeasure.MeasureUnitCode, # associated column is being removed
+                     ActivityBottomDepthHeightMeasure.MeasureValue, # all 0 or NA
+                     ActivityBottomDepthHeightMeasure.MeasureUnitCode, # associated column is being removed
+                     USGSPCode, # all 50468 or NA
+                     ResultDepthHeightMeasure.MeasureValue, # all 0 or NA
+                     HUCEightDigitCode)) # all 15050301 or NA
+```
+
+This column will indicate if the data is above or below detection limits. 
+```{r}
+ecoli_Processing$QuantificationLimit <- ifelse(ecoli_Processing$ResultMeasureValue > 2419 | ecoli_Processing$ResultDetectionConditionText == "Present Above Quantification Limit", "Present Above Quantification Limit", "Value")
+
+
+ecoli_Processing$QuantificationLimit <- ifelse(ecoli_Processing$ResultDetectionConditionText == "Present Below Quantification Limit"|ecoli_Processing$ResultDetectionConditionText == "Not Detected", "Present Below Quantification Limit", ecoli_Processing$QuantificationLimit)
+```
+
+This removes QAQC samples
+```{r}
+ecoli_SamplesOnly <- ecoli_Processing %>%
+  filter(ActivityTypeCode != "Quality Control Sample-Field Replicate" & ActivityTypeCode !="Quality Control Sample-Equipment Blank")
+
+# this is just a check to ensure that this leads me to the same count as the samples only table.
+#ecoli_Processing %>%
+#count(ActivityTypeCode == "Sample-Routine")
+
+```
+I want to create a column of data standardized to the detection limit of sodn sampling (2420). Some samples were much higher than that because they were diluted, but it appears not all of them were. I think the prediction can still happen if the values level off? something loggy maybe?
+
+```{r}
+eColi_ForAnalysis <- ecoli_SamplesOnly
+
+eColi_ForAnalysis$StandardizedResult <- eColi_ForAnalysis$ResultMeasureValue
+eColi_ForAnalysis$StandardizedResult <- ifelse(eColi_ForAnalysis$QuantificationLimit == 	
+"Present Above Quantification Limit", 2420, eColi_ForAnalysis$ResultMeasureValue)
+
+eColi_ForAnalysis$StandardizedResult <- ifelse(eColi_ForAnalysis$QuantificationLimit == "Present Below Quantification Limit",0, eColi_ForAnalysis$ResultMeasureValue)
+```
+
