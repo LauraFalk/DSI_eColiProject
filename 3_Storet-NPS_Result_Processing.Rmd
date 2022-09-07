@@ -66,6 +66,7 @@ I want to create a column of data standardized to the detection limit of sodn sa
 ```{r}
 eColi_ForAnalysis <- ecoli_SamplesOnly
 
+#LAURA this doesn't work but I don't know why. Fix tomorrow. 
 eColi_ForAnalysis$StandardizedResult <- eColi_ForAnalysis$ResultMeasureValue
 eColi_ForAnalysis$StandardizedResult <- ifelse(eColi_ForAnalysis$QuantificationLimit == 	
 "Present Above Quantification Limit", 2420, eColi_ForAnalysis$ResultMeasureValue)
