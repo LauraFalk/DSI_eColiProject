@@ -66,11 +66,48 @@ I want to create a column of data standardized to the detection limit of sodn sa
 ```{r}
 eColi_ForAnalysis <- ecoli_SamplesOnly
 
-#LAURA this doesn't work but I don't know why. Fix tomorrow. 
 eColi_ForAnalysis$StandardizedResult <- eColi_ForAnalysis$ResultMeasureValue
-eColi_ForAnalysis$StandardizedResult <- ifelse(eColi_ForAnalysis$QuantificationLimit == 	
-"Present Above Quantification Limit", 2420, eColi_ForAnalysis$ResultMeasureValue)
+eColi_ForAnalysis$StandardizedResult <- ifelse(eColi_ForAnalysis$QuantificationLimit == "Present Above Quantification Limit", 2420, eColi_ForAnalysis$StandardizedResult)
 
-eColi_ForAnalysis$StandardizedResult <- ifelse(eColi_ForAnalysis$QuantificationLimit == "Present Below Quantification Limit",0, eColi_ForAnalysis$ResultMeasureValue)
+eColi_ForAnalysis$StandardizedResult <- ifelse(eColi_ForAnalysis$QuantificationLimit == "Present Below Quantification Limit",0, eColi_ForAnalysis$StandardizedResult)
+
+eColi_ForAnalysis %>%
+  count(StandardizedResult == 2420)
+# I currently have 431 maximum results.
+
+eColi_ForAnalysis %>%
+  count(StandardizedResult >126)
+#772 are greater than the single standard EPA guideline (126 MPN)
+
+eColi_ForAnalysis %>%
+  count(StandardizedResult >235)
+#664 samples are greater than 235, my normal comparison for warm effluent water.
+
+eColi_ForAnalysis %>%
+  count(StandardizedResult <1)
+#There are only 3 non-detect
+
+eColi_ForAnalysis %>%
+  count(QuantificationLimit == "Present Below Quantification Limit")
+#Verified that there are only 3 non-detect
+
+eColi_ForAnalysis %>%
+  count(is.na(StandardizedResult))
+# There are no NA values
+```
+```{r}
+ecoli_ForAttribution <- eColi_ForAnalysis %>%
+  select(DateAsDate, ActivityStartTime.Time, ActivityStartTime.TimeZoneCode, MonitoringLocationIdentifier,
+         HydrologicCondition,
+         HydrologicEvent,
+         ResultValueTypeName,
+         ResultStatusIdentifier,
+         QuantificationLimit,
+         StandardizedResult)
+```
+
+Remove uneccesary columns so I don't get confused
+```{r}
+remove(ecoli_Processing, ecoli_SampleLimit, ecoli_SamplesOnly, eColi_ForAnalysis)
 ```
 

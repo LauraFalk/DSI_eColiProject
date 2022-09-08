@@ -1,0 +1,19 @@
+---
+title: "4_FinalAttribution"
+author: "Laura Palacios"
+date: '2022-09-08'
+output: html_document
+---
+
+```{r setup, include=FALSE}
+library(knitr)
+opts_chunk$set(echo = TRUE)
+```
+
+This is going to be for attributing to the processed e coli data:
+1. flow or water pulses
+2. air temperature
+3. season (Monsoon, Fall, Winter, Summer - USE SODN criteria)
+4. possibly precip data: options - rainfall in last month, rainfall in last year, time since last rainfall
+5. possibly location - miles from the Nogales plant
+6. what else?
