@@ -6,6 +6,7 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
+library(data.table)
 library(knitr)
 library(lubridate)
 library(tidyverse)
@@ -141,7 +142,7 @@ setnames(USGS_ForAnalysis2,old=c("Filled"),new=c("Discharge_CFS"))
 
 Remove prior files so that I don't get confused.
 ```{r}
-remove(TimeFlag, TimeSeries, USGS_TimeSeries, USGS_Raw, USGS_Standardized, USGS_TimeSeries_Fill, USGS_ForAnalysis, USGS_RmDupl, USGS_RmDupls, USGS_Standardized_RmDupls, view)
+remove(TimeFlag, TimeSeries, USGS_TimeSeries, USGS_Raw, USGS_Standardized, USGS_TimeSeries_Fill, USGS_ForAnalysis, USGS_RmDupl, USGS_Standardized_RmDupls)
 ```
 
 ```{r}
