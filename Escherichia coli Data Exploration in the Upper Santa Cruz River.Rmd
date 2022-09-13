@@ -6,6 +6,7 @@ output: html_notebook
 ```{r setup, include=FALSE}
 library(data.table)
 library(dataRetrieval)
+library(janitor)
 library(knitr)
 library(lubridate)
 library(tidyverse)
@@ -53,7 +54,8 @@ USGS_Standardized$DateTime2 <-as.POSIXct(format(USGS_Standardized$DateTime2, for
 
 This indicates that there are duplicate entries which have arisen from the 15-minute standardization. This is because the data was not collected on the standard 15-minute interval. The separate values were rounded to the same value.
 ```{r}
-USGS_Standardized %>% group_by(DateTime2) %>% summarise(n=sum(n())) %>% filter(n>1)
+# Loaded plyr for later testing and it made this piece of the code upset. "dplyr::" should not be necessary, but it avoids issues.
+USGS_Standardized %>% group_by(DateTime2) %>% dplyr::summarise(n=sum(n())) %>% filter(n>1)
 ```
 
 Ah. This is due to the rounding process.
@@ -243,26 +245,31 @@ Locations <- read.csv(RawLocation)
 ```
 
 Merge the SODN and Storet Raw Data files
-LAURA START HERE TOMORROW
 ```{r}
+# Merge the two dataframes together. SODN raw data was outputted to match the STORET format. Fields were manually filled by data management.
 ecoli_data <- rbind(RawStoret_data, RawSODN_data)
+
+# Use Janitor to clean null columns
+ecoli_data<- remove_empty(ecoli_data, c("cols"))
+
+# Remove the pre-merged raw data
+remove(RawStoret_data, RawSODN_data)
 ```
 
 
+Now we must clean up the data further.
+Keep only the columns which contain E. coli data. Other colifoms or enterolert (etc) procedures are within the STORET output. 
 
-Remove raw columns that are fecal coliform or other bacteria.
-
-CharacteristicName == Escherichia coli
-fecal coliforms may be applicable, but I am limiting my study to after the NIWWT update in 2009.
- or 
+Note: Fecal coliforms may also be applicable, but for the initial study I would like to stick solely to Escherichia coli. Nick Paretti (USGS) indicated that this maybe a better options due to the increased varaiblility. Fecal coliforms (non-species specific) have maximum results much more often and may be less meaningful.
 ```{r}
-ecoli_data <- coliform_data[coliform_data$CharacteristicName == "Escherichia coli", ] 
+# STORET has standardized the output as "Excherichia coli"
+ecoli_data <- ecoli_data[ecoli_data$CharacteristicName == "Escherichia coli", ] 
 ```
 
 Remove columns with methods other than 9223B
-
 ```{r}
-ecoli_data_9223b <- ecoli_data[ecoli_data$ResultAnalyticalMethod.MethodName == "E coli, water, Colilert (24-28)"|
+# The methods are not standardized in STORET. It is assumed that all forms of Colilert and SM9223B represent comparable results. Colilert comes in both an 18 and 24 hour test, but they are assumed to provide a comparable output. 
+ecoli_data <- ecoli_data[ecoli_data$ResultAnalyticalMethod.MethodName == "E coli, water, Colilert (24-28)"|
                                     ecoli_data$ResultAnalyticalMethod.MethodName ==  "COLILERT (EDBERG)"|
                                     ecoli_data$ResultAnalyticalMethod.MethodName ==  "COLILERT"|
                                     ecoli_data$ResultAnalyticalMethod.MethodName ==  "SM 9223B", ] 
@@ -276,16 +283,17 @@ ecoli_data_9223b_date <- ecoli_data_9223b[ecoli_data_9223b$DateAsDate >= "2009-0
 ```
 
 
+Merge the files based on monitoring location identifier.Monitoring locations were outputted from an ARCGIS lasso of the range between the NIWWTP/Sonoita Creek inputs and the end of the Upper Santa Cruz River.
 
-Merge the files based on monitoring location identifier
-# this will decrease the number of rows in the dataset because it excludes measurements outside of the study range (namely the sonoita creek data)
+This will decrease the number of rows in the dataset because it excludes measurements outside of the study range (namely the sonoita creek data)
 ```{r}
-ecoli_SampleLimit<- merge(ecoli_data_9223b_date, Locations, by = c("MonitoringLocationIdentifier"))
+# Merge on the Monitoring Location Identifier (outputted by STORET). The single SODN monitoring location was manually added to the end of this file before import.
+ecoli_data<- merge(ecoli_data, Locations, by = c("MonitoringLocationIdentifier"))
 ```
 
-Remove uneccesary columns so I don't get confused
+Remove unnecessary tables. 
 ```{r}
-remove(coliform_data, ecoli_data, ecoli_data_9223b, ecoli_data_9223b_date, Locations, LocationFileName, RawFileName)
+remove(Locations, ecoli_data)
 ```
 
 
