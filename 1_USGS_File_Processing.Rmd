@@ -14,19 +14,25 @@ library(zoo)
 opts_chunk$set(echo = TRUE)
 ```
 
-###ONLY RUN THIS ONCE.
-This is the data pull for USGS data. It is many years and takes lots of time to grab all 300k records. Use CSV for data between 7/1/2009 and 8/30/2022
+#Processing the USGS File
+
+I have commented out the data pull for USGS data. It is many years and takes lots of time to grab all 300k records when running this script. To save time, I've outputted the result of: 
+readNWISuv(site_id,c('00060','00065'), "2009-07-01","2022-08-30", "America/Phoenix")
+as USGS_09481740.CSV and saved this within the raw data folder.
+
+Original code may be un-commented and re-run if desired. Data from 2022 is currently provisional and is still subject to change during USGS QAQC procedures.
 ```{r}
+#Inputs formatted for read NWIS function.
 site_id <- '09481740'
 startDate = "2009-07-01"
-#End date is 8/30/2022 to avoid null data at this time (9/5/2022)
 endDate = "2022-08-30"
-tz="America/Phoenix"
+tz="America/Phoenix" # End date is 8/30/2022 to avoid null data at this time (9/5/2022)
 
 #creates table in R
-#USGS_Raw <- readNWISuv(site_id,c('00060','00065'), startDate,endDate, tz)
-#write.csv(USGS_Raw,"Data/Raw/USGS_09481740.csv")
+USGS_Raw <- readNWISuv(site_id,c('00060','00065'), startDate,endDate, tz)
+write.csv(USGS_Raw,"Data/Raw/USGS_09481740.csv")
 
+#This reads in the previously created CSV to save processing time.
 USGS_Raw <- read.csv("Data/Raw/USGS_09481740.csv")
 ```
 

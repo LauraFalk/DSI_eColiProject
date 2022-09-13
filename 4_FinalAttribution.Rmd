@@ -6,9 +6,11 @@ output: html_document
 ---
 
 ```{r setup, include=FALSE}
+library(corrplot)
 library(knitr)
 library(lubridate)
 library(tidyverse)
+library(zoo)
 opts_chunk$set(echo = TRUE)
 ```
 
@@ -38,14 +40,15 @@ Storet_USGS_Merge %>%
 ```
 
 
-Now to handle the ones that didn't merge.
+Remove the nulls from the merge. This is performed here rather than by using a sided join so that I may decide to do something different later on.
 ```{r}
 Storet_USGS_Merge_NoNull <- Storet_USGS_Merge %>%
   filter(!is.na(Discharge_CFS))
   
 ```
 
-Lets look at what the data currently looks like. The blue dotted line indicates the standard for average measurements. It is not technically applicable here, but gives a baseline. The red line is the actual standard for warm water effluent in AZ. 
+
+Look at what the data currently looks like. The red line is the actual standard for warm water effluent in AZ. The blue dotted line indicates the state standard for an average of three+ measurements. It is not technically applicable here, but gives a baseline. It may  be used to flag "Concerning-but-not-technically-bad" levels of E. coli.
 ```{r}
 Storet_USGS_Merge_NoNull %>%
   ggplot(aes(x=Discharge_CFS, y=StandardizedResult)) +
@@ -55,6 +58,7 @@ Storet_USGS_Merge_NoNull %>%
   geom_hline(yintercept=235, linetype="dashed", 
                 color = "red", size=0.2)
 ```
+
 Now I want to see what it looks like without the outlying discharge values.
 ```{r}
 Storet_USGS_Merge_NoNull %>%
@@ -84,6 +88,18 @@ Let's add some air temperature up in here up in here.
 ```{r}
 DailyClimate <- read.csv("Data/Raw/ClimateAnalyzer_DailySummaryStats.csv", skip = 3)
 DailyClimate <- head(DailyClimate, - 1)
+```
+
+What about the sum of previous three-days precipitation
+LAURA YOURE HERE
+```{r}
+DailyClimate$Previous3Precip <-  rollsumr(DailyClimate$Precipitation..in., k = 3, fill = NA)
+DailyClimate$Previous7Precip <-  rollsumr(DailyClimate$Precipitation..in., k = 7, fill = NA)
+DailyClimate$Previous30Precip <-  rollsumr(DailyClimate$Precipitation..in., k = 30, fill = NA)
+```
+
+
+```{r}
 DailyClimate$DateAsDate <- str_sub(DailyClimate$Date,-10,-1)
 DailyClimate$DateAsDate <-as.POSIXct(DailyClimate$DateAsDate, format = "%m/%d/%Y", tz = tz)
 ```
@@ -159,4 +175,55 @@ Storet_USGS_Climate_Merge$Season <- ifelse(Storet_USGS_Climate_Merge$Season1 > 9
 ```
 
 
+The columns are getting messy. Remove duplicates and nulls
+```{r}
+Storet_USGS_Climate_Merge <-Storet_USGS_Climate_Merge %>%
+  select(-DateTime, -X.x, -agency_cd, -site_no, -dateTime, -Date, -X.y, -Season1)
+```
+
+
+```{r}
+Storet_USGS_Climate_Merge %>%
+  ggplot(aes(x=Season, y=StandardizedResult)) +
+  geom_point() +
+  geom_hline(yintercept=126, linetype="dashed", 
+                color = "blue", size=0.2) +
+  geom_hline(yintercept=235, linetype="dashed", 
+                color = "red", size=0.2)
+```
+Notes on above diagram: Monsoon values seem significantly above blue line. Winter values have many less maximum values.
+
+
+
+graph this too.
+```{r}
+Storet_USGS_Climate_Merge %>%
+  ggplot() +
+  geom_point(aes(x=Previous3Precip, y=StandardizedResult), color = "red") +
+  geom_point(aes(x=Previous7Precip, y=StandardizedResult), color = "blue")+
+  geom_point(aes(x=Previous30Precip, y=StandardizedResult), color = "green")+
+  geom_hline(yintercept=126, linetype="dashed", 
+                color = "blue", size=0.2) +
+  geom_hline(yintercept=235, linetype="dashed", 
+                color = "red", size=0.2)
+```
+
+I should change the categorical variables to numeric for corrplot. After changing them to text. oops. 
+Numerical Categorical
+```{r}
+Storet_USGS_Climate_Merge$SeasonNumeric <- ifelse(Storet_USGS_Climate_Merge$Season == "Fall", 1,
+                                                  ifelse(Storet_USGS_Climate_Merge$Season == "Winter", 2,
+                                                  ifelse (Storet_USGS_Climate_Merge$Season =="Spring", 3,4)))
+```
+
+Lets try corrplot
+```{r}
+ForCorrplot <- Storet_USGS_Climate_Merge %>%
+  select(StandardizedResult, Discharge_CFS, Precipitation..in., Tmax..F., Tmin..F., PreviousPrecip, Previous3Precip, Previous7Precip, Previous30Precip, SeasonNumeric)
+
+sapply(ForCorrplot, class) # Ensure these are all numeric
+
+
+ForCorrplot <- 
+```
 
