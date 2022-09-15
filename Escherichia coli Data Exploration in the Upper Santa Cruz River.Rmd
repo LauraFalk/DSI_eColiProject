@@ -268,6 +268,13 @@ Note: Fecal coliforms may also be applicable, but for the initial study I would 
 ecoli_data <- ecoli_data[ecoli_data$CharacteristicName == "Escherichia coli", ] 
 ```
 
+I also want to remove anything with a time zone other than MST. I cannot verify if this is a typo or an actual data point.
+With the 9/13 data pull this is only one record.
+```{r}
+# STORET has standardized the output as "Excherichia coli"
+ecoli_data <- ecoli_data[ecoli_data$ActivityStartTime.TimeZoneCode == "MST", ] 
+```
+
 Remove columns with methods other than 9223B
 ```{r}
 # The methods are not standardized in STORET. It is assumed that all forms of Colilert and SM9223B represent comparable results. Colilert comes in both an 18 and 24 hour test, but they are assumed to provide a comparable output. 
@@ -315,7 +322,7 @@ ecoli_data <- keep(ecoli_data, ~n_distinct(.) > 1)
 
 View the data. There are still columns I don't need.
 ```{r}
-# Use the summary function to look at what data exists. Commented out because it is unecessary.
+# Use the summary function to look at what data exists. Commented out because it is unnecessary.
 #summary(ecoli_data)
 ```
 
@@ -323,7 +330,9 @@ Take out columns that don't have meaningful data. Numeric First
 ```{r}
 # Select only columns that I want to use for analysis
 ecoli_data<- ecoli_data %>%
-  select(DateAsDate, ActivityStartTime.Time, ActivityStartTime.TimeZoneCode, MonitoringLocationIdentifier,
+  select(DateAsDate, 
+         ActivityStartTime.Time,  
+         MonitoringLocationIdentifier,
          HydrologicCondition,
          HydrologicEvent,
          ResultValueTypeName,
@@ -487,7 +496,6 @@ remove(Rawclimate)
 ```
 
 What about the sum of previous three-days precipitation
-LAURA YOURE HERE
 ```{r}
 DailyClimate$Previous3Precip <-  rollsumr(DailyClimate$Precipitation..in., k = 3, fill = NA)
 DailyClimate$Previous7Precip <-  rollsumr(DailyClimate$Precipitation..in., k = 7, fill = NA)
@@ -573,12 +581,21 @@ data_Merge2$Season <- ifelse(data_Merge2$Season1 > 9 & data_Merge2$Season1 < 13,
 
 The columns are getting messy. Remove duplicates and nulls
 ```{r}
-LAURA START HERE TOMORROW.
+# Remove extraneous columns and reorder
+
+# I had previously kept hydrologic condition and event in, but there are so many nulls I don't think it will be worth it. LAURA may be able to attribute the condition (rising or falling) based on the staff gage. Will need to speak to hydrologist.
+
+# Columns are organized so that the "metadata" columns are in the beginning. These will not be used for correlation views.
+data_Merge3 <- data_Merge2 %>%
+  select(MonitoringLocationIdentifier, QuantificationLimit, DailyFlowCount, DateTime2, StandardizedResult, Discharge_CFS, USGS_Staff, QuantificationLimit, Precipitation..in., Tmax..F., Tmin..F., Previous3Precip, Previous7Precip, Previous30Precip, Season)
+
+# Remove old data.
+remove(data_Merge, data_Merge2, DailyClimate)
 ```
 
 
 ```{r}
-Storet_USGS_Climate_Merge %>%
+data_Merge3 %>%
   ggplot(aes(x=Season, y=StandardizedResult)) +
   geom_point() +
   geom_hline(yintercept=126, linetype="dashed", 
@@ -592,7 +609,8 @@ Notes on above diagram: Monsoon values seem significantly above blue line. Winte
 
 graph this too.
 ```{r}
-Storet_USGS_Climate_Merge %>%
+# Missing values are expected.
+data_Merge3 %>%
   ggplot() +
   geom_point(aes(x=Previous3Precip, y=StandardizedResult), color = "red") +
   geom_point(aes(x=Previous7Precip, y=StandardizedResult), color = "blue")+
@@ -606,18 +624,48 @@ Storet_USGS_Climate_Merge %>%
 I should change the categorical variables to numeric for corrplot. After changing them to text. oops. 
 Numerical Categorical
 ```{r}
-Storet_USGS_Climate_Merge$SeasonNumeric <- ifelse(Storet_USGS_Climate_Merge$Season == "Fall", 1,
-                                                  ifelse(Storet_USGS_Climate_Merge$Season == "Winter", 2,
-                                                  ifelse (Storet_USGS_Climate_Merge$Season =="Spring", 3,4)))
+data_Merge3$SeasonNumeric <- ifelse(data_Merge3$Season == "Fall", 1,
+                                                  ifelse(data_Merge3$Season == "Winter", 2,
+                                                  ifelse (data_Merge3$Season =="Spring", 3,4)))
 ```
 
-Lets try corrplot
+
+I want to look at nulls from the climate data. I think this will have an effect on my corrplot. With removed rows, I still have 906 to play with.
 ```{r}
-ForCorrplot <- Storet_USGS_Climate_Merge %>%
-  select(StandardizedResult, Discharge_CFS, Precipitation..in., Tmax..F., Tmin..F., PreviousPrecip, Previous3Precip, Previous7Precip, Previous30Precip, SeasonNumeric)
-
-sapply(ForCorrplot, class) # Ensure these are all numeric
-
-
-ForCorrplot <- 
+data_Merge3 <- na.omit(data_Merge3)
 ```
+
+## Data Exploration 2.0
+
+Now that I've looked at the overall data, make a test and train set to proceed.
+```{r}
+# De-randomize (for now, at least). 
+set.seed(24)
+
+#subset the data by 70%
+subset <- sample(nrow(data_Merge3),nrow(data_Merge3) * 0.7)
+
+#create training and test data from subset
+traindata <- data_Merge3[subset, ]
+testdata <- data_Merge3[-subset, ]
+
+```
+
+Pairs examination
+```{r}
+# Ensure that only numeric data is contained. There was a previous cleanup but it still contained metadata.
+testdata_numeric <- testdata %>%
+  select(c(5:13,15))
+
+# I can look at pairs
+pairs(testdata_numeric)
+
+```
+Correlation Matrix
+```{r}
+# Create correlation matrix
+cor <- cor(testdata_numeric)
+
+corrplot(cor, method = 'square', order = 'FPC', type = 'upper', diag = FALSE, addCoef.col="black", number.cex=0.75)
+```
+
