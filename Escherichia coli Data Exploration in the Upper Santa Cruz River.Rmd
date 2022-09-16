@@ -340,7 +340,8 @@ ecoli_data<- ecoli_data %>%
          ResultStatusIdentifier,
          ResultMeasureValue,
          ResultDetectionConditionText,
-         ActivityTypeCode)
+         ActivityTypeCode,
+         ActivityConductingOrganizationText)
 
 ```
 
@@ -628,7 +629,7 @@ The columns are getting messy. Remove duplicates and nulls
 
 # Columns are organized so that the "metadata" columns are in the beginning. These will not be used for correlation views.
 data_Merge3 <- data_Merge2 %>%
-  select(MonitoringLocationIdentifier, QuantificationLimit, DailyFlowCount, DateTime2, StandardizedResult, Discharge_CFS, USGS_Staff, QuantificationLimit, Precipitation..in., Tmax..F., Tmin..F., Previous3Precip, Previous7Precip, Previous30Precip, Season, NinXTS)
+  select(ActivityConductingOrganizationText, MonitoringLocationIdentifier, QuantificationLimit, DailyFlowCount, DateTime2, StandardizedResult, Discharge_CFS, USGS_Staff, QuantificationLimit, Precipitation..in., Tmax..F., Tmin..F., Previous3Precip, Previous7Precip, Previous30Precip, Season, NinXTS)
 
 # Remove old data.
 remove(data_Merge, data_Merge2, DailyClimate, Nin, NinXTS)
@@ -666,11 +667,31 @@ I should change the categorical variables to numeric for corrplot. After changin
 Numerical Categorical
 ```{r}
 data_Merge3$SeasonNumeric <- ifelse(data_Merge3$Season == "Fall", 1,
-                                                  ifelse(data_Merge3$Season == "Winter", 2,
-                                                  ifelse (data_Merge3$Season =="Spring", 3,4)))
+          ifelse(data_Merge3$Season == "Winter", 2,
+          ifelse (data_Merge3$Season =="Spring", 3,4)))
 ```
 
 
+I want to change the organization to numeric as well.
+
+I'd like to look at organization to see if this has any noteworthy effect on the results. If it appears significant, this could be due to the time of testing (project funding is more likely when there is an issue) or due to the personell collecting the data. A strong correlation will indicate either of these issues.
+```{r}
+data_Merge3$ACO_Numeric <- ifelse(data_Merge3$ActivityConductingOrganizationText == "U.S. National Park Service", 1,
+   ifelse(data_Merge3$ActivityConductingOrganizationText == "NATIONAL PARK SERVICE", 1,
+   ifelse(data_Merge3$ActivityConductingOrganizationText == "Friends of the Santa Cruz River, Tubac, AZ", 2, 
+   ifelse(data_Merge3$ActivityConductingOrganizationText =="FRIENDS OF THE SANTA CRUZ RIVER", 2,
+   ifelse(data_Merge3$ActivityConductingOrganizationText == "U.S. Geological Survey-Water Resources Discipline", 3, 
+   ifelse(data_Merge3$ActivityConductingOrganizationText == "ARIZONA DEPT OF ENVIRONMENTAL QUALITY", 4,  
+   ifelse(data_Merge3$ActivityConductingOrganizationText == "INTERNATIONAL BOUNDARY AND WATER COMMISSION", 5,  
+   ifelse(data_Merge3$ActivityConductingOrganizationText == "UNIVERSITY OF ARIZONA - MARICOPA AGRICULTURAL CENTER", 6, 
+   ifelse(data_Merge3$ActivityConductingOrganizationText == "HARRIS ENVIRONMENTAL", 7,
+   ifelse(data_Merge3$ActivityConductingOrganizationText == "NPS", 8,  # This is SODN data, Separate from other NPS 
+   ifelse(data_Merge3$ActivityConductingOrganizationText == "VOLUNTEER GROUPS", 9,        
+          NaN)))))))))))
+```
+
+
+## Begin looking at the correlation
 
 I want to look at nulls from the climate data. I think this will have an effect on my corrplot. With removed rows, I still have 906 to play with.
 ```{r}
@@ -698,7 +719,7 @@ Use the *Training* data to train the models. Test data comes in for validation p
 ```{r}
 # Ensure that only numeric data is contained. There was a previous cleanup but it still contained metadata.
 traindata_numeric <- traindata %>%
-  select(c(5:13,15:16))
+  select(c(6:14,16:18))
 
 # I can look at pairs
 pairs(traindata_numeric)
@@ -715,3 +736,18 @@ corrplot(cor, method = 'square', order = 'FPC', type = 'upper', diag = FALSE, ad
 It is important to ensure that I do not include correlated predictors in this model. If I choose a precipitation variable, it should only be one. Same for temperature and discharge/staff. 
 
 Season and temperature are also extremely strongly correlated. It may make sense to use only one variable. 
+
+Currently I'm looking at:
+1. Previous 30 Precip - interesting that it has mroe of an effect than 7 an 3. Possibly something to do with flooding washing out? Or interactions when the water is extremely low and it hasn't rained in months?
+2. T min
+3. USGS Staff - there may be slightly more values between discharge and staff since discharge is sometimes questionable at high levels? Interesting that they are different by 0.1
+4. possibly NinXTS?
+
+```{r}
+
+```
+
+Note for LAURA:
+Do I need to look at time of day?
+What about distance from Sonoita. Number from north to south or vice versa?
+What about the rise/fall of stage?
