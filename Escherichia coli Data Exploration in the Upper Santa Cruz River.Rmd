@@ -11,6 +11,7 @@ library(janitor)
 library(knitr)
 library(lubridate)
 library(tidyverse)
+library(xts)
 library(zoo)
 opts_chunk$set(echo = TRUE)
 ```
@@ -578,6 +579,46 @@ data_Merge2$Season <- ifelse(data_Merge2$Season1 > 9 & data_Merge2$Season1 < 13,
                                     "Spring", "Monsoon")))
 ```
 
+I would also like to include a variable to el nino or la nina years, as per a discussion with NPS regional hydrologist, Salek. 
+```{r}
+# Bring in the data
+Nin <- read.csv("Data/Raw/Nino_Nina_Raw.csv")
+
+# Pivot - begin creating a date column by converting to long format
+Nin <- Nin %>% pivot_longer(cols=c('DJF', 'JFM','FMA', 'MAM', 'AMJ', 'MJJ', 'JJA', 'JAS', 'ASO', 'SON', 'OND', 'NDJ'),
+                    names_to='Month',
+                    values_to='NinIndex')
+
+# Use the central month
+Nin$Month <- c("DJF" = "01", "JFM" = "02", "FMA" = "03", "MAM" = "04",'AMJ'= '05', 'MJJ'='06', 'JJA'='07', 'JAS'='08', 'ASO'='09', 'SON'='10', 'OND'='11', 'NDJ'='12')[Nin$Month]
+
+# Create a date column to represent the first date
+Nin$Day = "01"
+
+# Convert all this to numeric
+Nin$Date <- as.POSIXct(format(paste(Nin$Year, Nin$Month, Nin$Day, sep = "-"), format = '%Y-%m-%d %H:%M'), tz = tz)
+
+# Remove the columns with no data so that it is properly attributed.
+Nin <- head(Nin, -4)
+
+#[https://stackoverflow.com/questions/50167509/converting-monthly-data-to-daily-in-r]
+# Create an xts in order to attribute each data point on the first day of the month to ALL days of the month
+NinXTS <- xts(Nin$NinIndex,order.by = Nin$Date)
+
+# Lengthen the dataset to represent all dates
+Nin <- na.locf(merge(NinXTS, foo=zoo(NA, order.by=seq(start(NinXTS), end(NinXTS),
+  "day",drop=F)))[, 1])
+
+Nin <- data.frame(DateAsDate=index(Nin), coredata(Nin))
+```
+Merge this with e coli dataset
+
+```{r}
+data_Merge2 <- left_join(data_Merge2, 
+                          Nin, by = c("DateAsDate"))
+```
+
+
 
 The columns are getting messy. Remove duplicates and nulls
 ```{r}
@@ -587,10 +628,10 @@ The columns are getting messy. Remove duplicates and nulls
 
 # Columns are organized so that the "metadata" columns are in the beginning. These will not be used for correlation views.
 data_Merge3 <- data_Merge2 %>%
-  select(MonitoringLocationIdentifier, QuantificationLimit, DailyFlowCount, DateTime2, StandardizedResult, Discharge_CFS, USGS_Staff, QuantificationLimit, Precipitation..in., Tmax..F., Tmin..F., Previous3Precip, Previous7Precip, Previous30Precip, Season)
+  select(MonitoringLocationIdentifier, QuantificationLimit, DailyFlowCount, DateTime2, StandardizedResult, Discharge_CFS, USGS_Staff, QuantificationLimit, Precipitation..in., Tmax..F., Tmin..F., Previous3Precip, Previous7Precip, Previous30Precip, Season, NinXTS)
 
 # Remove old data.
-remove(data_Merge, data_Merge2, DailyClimate)
+remove(data_Merge, data_Merge2, DailyClimate, Nin, NinXTS)
 ```
 
 
@@ -630,6 +671,7 @@ data_Merge3$SeasonNumeric <- ifelse(data_Merge3$Season == "Fall", 1,
 ```
 
 
+
 I want to look at nulls from the climate data. I think this will have an effect on my corrplot. With removed rows, I still have 906 to play with.
 ```{r}
 data_Merge3 <- na.omit(data_Merge3)
@@ -652,20 +694,24 @@ testdata <- data_Merge3[-subset, ]
 ```
 
 Pairs examination
+Use the *Training* data to train the models. Test data comes in for validation procedures.
 ```{r}
 # Ensure that only numeric data is contained. There was a previous cleanup but it still contained metadata.
-testdata_numeric <- testdata %>%
-  select(c(5:13,15))
+traindata_numeric <- traindata %>%
+  select(c(5:13,15:16))
 
 # I can look at pairs
-pairs(testdata_numeric)
+pairs(traindata_numeric)
 
 ```
 Correlation Matrix
 ```{r}
 # Create correlation matrix
-cor <- cor(testdata_numeric)
+cor <- cor(traindata_numeric)
 
 corrplot(cor, method = 'square', order = 'FPC', type = 'upper', diag = FALSE, addCoef.col="black", number.cex=0.75)
 ```
 
+It is important to ensure that I do not include correlated predictors in this model. If I choose a precipitation variable, it should only be one. Same for temperature and discharge/staff. 
+
+Season and temperature are also extremely strongly correlated. It may make sense to use only one variable. 
