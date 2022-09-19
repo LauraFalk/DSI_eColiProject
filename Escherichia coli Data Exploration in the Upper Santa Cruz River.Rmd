@@ -4,6 +4,7 @@ output: html_notebook
 ---
 
 ```{r setup, include=FALSE}
+library(chron)
 library(corrplot)
 library(data.table)
 library(dataRetrieval)
@@ -27,20 +28,21 @@ readNWISuv(site_id,c('00060','00065'), "2009-07-01","2022-08-30", "America/Phoen
 as USGS_09481740.CSV and saved this within the raw data folder on 9/12/2022.
 
 Original code may be un-commented and re-run if desired. Data after 1/10/2022 is currently provisional and is still subject to change during USGS QAQC procedures.
+
+Triple hashes (###) are meant to indicate code that has been commented-out or added in order to expedite the processing (by use of a saved csv file of processed data rather than repeating the processing each time). If code is fully automated, these chunks are to be altered.
 ```{r}
-# Inputs formatted for read NWIS function.
-#site_id <- '09481740'
-#startDate = "2009-07-01"
-#endDate = "2022-08-30"
+#### Inputs formatted for read NWIS function.
+####site_id <- '09481740'
+####startDate = "2009-06-01"
+####endDate = "2022-08-30"
 
 # Input timezone for NWIS and POSIXT functions
 tz="America/Phoenix" # End date is 8/30/2022 to avoid null data at this time (9/5/2022)
 
-# creates table in R
-#USGS_Raw <- readNWISuv(site_id,c('00060','00065'), startDate,endDate, tz)
-#write.csv(USGS_Raw,"Data/Raw/USGS_09481740.csv")
+#### creates table in R
+####USGS_Raw <- readNWISuv(site_id,c('00060','00065'), startDate,endDate, tz)
 
-# This reads in the previously created CSV to save processing time.
+###Read in raw data
 USGS_Raw <- read.csv("Data/Raw/USGS_09481740.csv")
 ```
 
@@ -89,7 +91,7 @@ Though the data is nearly complete, there are still some missing values for the 
 This will create a full time series to include indicator of no data.
 ```{r}
 # Create the time series, formatted as POSIXct
-TimeSeries <- data.frame(seq.POSIXt(as.POSIXct(format("2009-07-01 0:00",format = '%m/%d/%y %H:%M'), tz = tz), as.POSIXct(format("2022-08-30 0:00",format = '%m/%d/%y %H:%M'), tz = tz), by="15 min"))
+TimeSeries <- data.frame(seq.POSIXt(as.POSIXct(format("2009-06-01 0:00",format = '%m/%d/%y %H:%M'), tz = tz), as.POSIXct(format("2022-08-30 0:00",format = '%m/%d/%y %H:%M'), tz = tz), by="15 min"))
 
 # Rename the Column DateTime2 to indicate properly formatted column.
 colnames(TimeSeries)[1] = "DateTime2"
@@ -101,7 +103,6 @@ USGS_Standardized <- merge(x=TimeSeries,y=USGS_Standardized,by="DateTime2",all.x
 
 # Remove the created time series. Data has been merged
 remove(TimeSeries)
-
 ```
 Notice that 2009-07-01 04:30:00 is now a row which indicates no data.
 
@@ -109,7 +110,7 @@ Notice that 2009-07-01 04:30:00 is now a row which indicates no data.
 We now have to handle the nulls we created.
 ```{r}
 # This tests to see how many nulls are present in the current dataset.
-# 9/5/2022: 40544 records are null
+# 9/5/2022: 40548 records are null
 count(USGS_Standardized %>%
  filter(is.na(Discharge_CFS)))
 ```
@@ -185,6 +186,25 @@ Remove Raw columns
 remove(USGS_Raw)
 ```
 
+#LAURA This may need more exploration. I want to categorically attribute a rising or falling stage to this data. Normal flow in this river has a diurnal cycle, so the max and min flows occur around noon and midnight. 
+
+To determine if the river is rising, I'm going to sum the difference of the last 24 readings?
+How about 12? I don't want to associate too much with temperature. Can use corr to determine if this is reasonable.
+```{r}
+# Take the difference between the two columns and attribute to the second column.
+USGS_Standardized <- USGS_Standardized %>% 
+  mutate(DisDif = Discharge_CFS - lag(Discharge_CFS))
+
+# This will create a binary variable or either rise of fall. Rise = 1, fall = 0. It will allow me to more easily create summary statistics.
+USGS_Standardized$DisDif2 <- ifelse(USGS_Standardized$DisDif>0,1,0)
+
+# Now I can summarize the differences and easily alter to what I want using the binary variable. This will create another binary variable where 1 = rise and 0 = fall.
+# 96 is one day of readings (24 hours x quarterly readings)
+USGS_Standardized$Stage24 <- rollsumr(USGS_Standardized$DisDif2, k = 96, fill = NA)
+
+```
+
+
 
 ## Merging the E. coli data sources and limiting to sample size.
 
@@ -234,8 +254,8 @@ The storet download file was placed into Arcmap and points within the sample ran
 ## Code
 Read in the raw data files
 ```{r}
-#This reads in the checkpoint file, if created.
-#USGS_Standardized <- read.csv("Data/Processed/USGS_Standardized.csv")
+####This reads in the checkpoint file, if created.
+####USGS_Standardized <- read.csv("Data/Processed/USGS_Standardized.csv")
 
 # This raw file contains the Storet and SODN data. The 30 SODN records were appended manually.
 RawStoret <- "Data/Raw/ecoli_Storet_Raw.csv"
@@ -407,14 +427,7 @@ ecoli_data<- ecoli_data %>%
 ```
 
 
-## Combine the ecoli, USGS, and climate data. Add seasonal attributes and create precipitation numeric attributes. May continue to change.
-
-1. flow or water pulses
-2. air temperature
-3. season (Monsoon, Fall, Winter, Summer - USE SODN criteria)
-4. possibly precip data: options - rainfall in last month, rainfall in last year, time since last rainfall
-5. possibly location - miles from the Nogales plant
-6. what else?
+## Combine the ecoli, USGS, and environmental variable data.
 
 
 First step. Merge the ecoli data with the USGS (flow) data.
@@ -442,6 +455,7 @@ remove(USGS_Standardized, ecoli_data)
 
 Remove the nulls from the merge. This is performed here rather than by using a sided join so that I may decide to do something different later on.
 ```{r}
+### Count is 1139
 data_Merge2 <- data_Merge %>%
   filter(!is.na(Discharge_CFS))
   
@@ -619,6 +633,22 @@ data_Merge2 <- left_join(data_Merge2,
                           Nin, by = c("DateAsDate"))
 ```
 
+Create an attribute column for time of day. This will get at the daily temp variance since the max/min attributes are daily values rather than 15-min or hourly.
+```{r}
+#modified from https://stackoverflow.com/questions/49370387/convert-time-object-to-categorical-morning-afternoon-evening-night-variable
+
+# Create  vector of times
+timep <- as.POSIXct(data_Merge2$ActivityStartTime.Time, format = "%H:%M") %>% format("%H:%M:%S")
+
+
+cut(chron::times(timep) , breaks = (1/24) * c(0,5,11,16,19,24), 
+    labels = c(4, 1, 2, 3, 4))
+
+data_Merge2$TOD <- cut(chron::times(timep) , breaks = (1/24) * c(0,5,11,16,19,24))
+data_Merge2$TOD <- c(4, 1, 2, 3, 4)[as.numeric(data_Merge2$TOD)]
+
+```
+
 
 
 The columns are getting messy. Remove duplicates and nulls
@@ -629,7 +659,7 @@ The columns are getting messy. Remove duplicates and nulls
 
 # Columns are organized so that the "metadata" columns are in the beginning. These will not be used for correlation views.
 data_Merge3 <- data_Merge2 %>%
-  select(ActivityConductingOrganizationText, MonitoringLocationIdentifier, QuantificationLimit, DailyFlowCount, DateTime2, StandardizedResult, Discharge_CFS, USGS_Staff, QuantificationLimit, Precipitation..in., Tmax..F., Tmin..F., Previous3Precip, Previous7Precip, Previous30Precip, Season, NinXTS)
+  select(ActivityConductingOrganizationText, MonitoringLocationIdentifier, QuantificationLimit, DailyFlowCount, DateTime2, StandardizedResult, Discharge_CFS, USGS_Staff, QuantificationLimit, Precipitation..in., Tmax..F., Tmin..F., Previous3Precip, Previous7Precip, Previous30Precip, Season, NinXTS, TOD)
 
 # Remove old data.
 remove(data_Merge, data_Merge2, DailyClimate, Nin, NinXTS)
@@ -693,7 +723,7 @@ data_Merge3$ACO_Numeric <- ifelse(data_Merge3$ActivityConductingOrganizationText
 
 ## Begin looking at the correlation
 
-I want to look at nulls from the climate data. I think this will have an effect on my corrplot. With removed rows, I still have 906 to play with.
+I want to look at nulls from the climate data. I think this will have an effect on my corrplot. With removed rows, I still have 896 to play with.
 ```{r}
 data_Merge3 <- na.omit(data_Merge3)
 ```
@@ -738,7 +768,7 @@ It is important to ensure that I do not include correlated predictors in this mo
 Season and temperature are also extremely strongly correlated. It may make sense to use only one variable. 
 
 Currently I'm looking at:
-1. Previous 30 Precip - interesting that it has mroe of an effect than 7 an 3. Possibly something to do with flooding washing out? Or interactions when the water is extremely low and it hasn't rained in months?
+1. Previous 30 Precip - interesting that it has more of an effect than 7 an 3. Possibly something to do with flooding washing out? Or interactions when the water is extremely low and it hasn't rained in months?
 2. T min
 3. USGS Staff - there may be slightly more values between discharge and staff since discharge is sometimes questionable at high levels? Interesting that they are different by 0.1
 4. possibly NinXTS?
@@ -748,6 +778,5 @@ Currently I'm looking at:
 ```
 
 Note for LAURA:
-Do I need to look at time of day?
 What about distance from Sonoita. Number from north to south or vice versa?
 What about the rise/fall of stage?
