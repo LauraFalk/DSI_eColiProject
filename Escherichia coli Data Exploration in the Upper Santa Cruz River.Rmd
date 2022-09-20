@@ -186,24 +186,46 @@ Remove Raw columns
 remove(USGS_Raw)
 ```
 
-#LAURA This may need more exploration. I want to categorically attribute a rising or falling stage to this data. Normal flow in this river has a diurnal cycle, so the max and min flows occur around noon and midnight. 
+#LAURA This still isn't giving the attributes that I want.  I need to pull out the between median values so that I can attribute them as "stable"
 
 To determine if the river is rising, I'm going to sum the difference of the last 24 readings?
 How about 12? I don't want to associate too much with temperature. Can use corr to determine if this is reasonable.
 ```{r}
-# Take the difference between the two columns and attribute to the second column.
-USGS_Standardized <- USGS_Standardized %>% 
-  mutate(DisDif = Discharge_CFS - lag(Discharge_CFS))
+CFS_Med <-  median(USGS_Standardized$Discharge_CFS, na.rm = TRUE)
+CFS_Med_low <- median(USGS_Standardized$Discharge_CFS, na.rm = TRUE) - 5
+CFS_Med_High <- median(USGS_Standardized$Discharge_CFS, na.rm = TRUE) + 5
+0
+# If the reading is less than the lowest median, 0 score for falling 
+USGS_Standardized$Medlow <- ifelse(USGS_Standardized$Discharge_CFS<CFS_Med_low,0,1)
+
+# If the reading is greater than the higher median bracket, 1 score for rising
+USGS_Standardized$Medhigh <- ifelse(USGS_Standardized$Discharge_CFS>CFS_Med_High,1,0)
 
 # This will create a binary variable or either rise of fall. Rise = 1, fall = 0. It will allow me to more easily create summary statistics.
-USGS_Standardized$DisDif2 <- ifelse(USGS_Standardized$DisDif>0,1,0)
+USGS_Standardized$MedDif2 <- ifelse(USGS_Standardized$DisDif>0,1,0)
 
-# Now I can summarize the differences and easily alter to what I want using the binary variable. This will create another binary variable where 1 = rise and 0 = fall.
-# 96 is one day of readings (24 hours x quarterly readings)
-USGS_Standardized$Stage24 <- rollsumr(USGS_Standardized$DisDif2, k = 96, fill = NA)
+# Summary statistic of all three things
+USGS_Standardized$MedSum <- USGS_Standardized$Medlow + USGS_Standardized$Medhigh + USGS_Standardized$DisDif2
+
+
+#USGS_Standardized$Stage24 <- rollsumr(USGS_Standardized$DisDif2, k = 96, fill = NA)
+
+USGS_Standardized$Stage24b <- ifelse(USGS_Standardized$MedSum <=1, "Falling", 
+          ifelse(USGS_Standardized$MedSum > 1 & USGS_Standardized$MedSum <= 2, "stable",
+          ifelse (USGS_Standardized$MedSum == 3,"Rising", NA)))
+USGS_Standardized %>%
+  count(Stage24b == "Falling")
 
 ```
 
+```{r}
+USGS_Standardized %>%
+ filter(DateTime2>as.POSIXlt.character("2015-10-01") 
+        & DateTime2 < as.POSIXlt.character("2015-10-15")) %>%
+  filter(Discharge_CFS<100) %>%
+  ggplot(aes(x=DateTime2, y=Discharge_CFS, color=Stage24b))+
+  geom_point()
+```
 
 
 ## Merging the E. coli data sources and limiting to sample size.
