@@ -191,39 +191,34 @@ remove(USGS_Raw)
 To determine if the river is rising, I'm going to sum the difference of the last 24 readings?
 How about 12? I don't want to associate too much with temperature. Can use corr to determine if this is reasonable.
 ```{r}
-CFS_Med <-  median(USGS_Standardized$Discharge_CFS, na.rm = TRUE)
-CFS_Med_low <- median(USGS_Standardized$Discharge_CFS, na.rm = TRUE) - 5
-CFS_Med_High <- median(USGS_Standardized$Discharge_CFS, na.rm = TRUE) + 5
-0
-# If the reading is less than the lowest median, 0 score for falling 
-USGS_Standardized$Medlow <- ifelse(USGS_Standardized$Discharge_CFS<CFS_Med_low,0,1)
+CFS_Quantiles<- quantile(USGS_Standardized$Discharge_CFS, na.rm = TRUE)
 
-# If the reading is greater than the higher median bracket, 1 score for rising
-USGS_Standardized$Medhigh <- ifelse(USGS_Standardized$Discharge_CFS>CFS_Med_High,1,0)
+USGS_Standardized <- USGS_Standardized %>% 
+  mutate(DisDif = Discharge_CFS - lag(Discharge_CFS))
 
 # This will create a binary variable or either rise of fall. Rise = 1, fall = 0. It will allow me to more easily create summary statistics.
-USGS_Standardized$MedDif2 <- ifelse(USGS_Standardized$DisDif>0,1,0)
-
-# Summary statistic of all three things
-USGS_Standardized$MedSum <- USGS_Standardized$Medlow + USGS_Standardized$Medhigh + USGS_Standardized$DisDif2
+USGS_Standardized$DisDif2 <- ifelse(USGS_Standardized$DisDif>0,1,0)
 
 
 #USGS_Standardized$Stage24 <- rollsumr(USGS_Standardized$DisDif2, k = 96, fill = NA)
+# 1 = low flow, 2 = stable, 3 = high rising, 4 = high falling.
 
-USGS_Standardized$Stage24b <- ifelse(USGS_Standardized$MedSum <=1, "Falling", 
-          ifelse(USGS_Standardized$MedSum > 1 & USGS_Standardized$MedSum <= 2, "stable",
-          ifelse (USGS_Standardized$MedSum == 3,"Rising", NA)))
-USGS_Standardized %>%
-  count(Stage24b == "Falling")
+USGS_Standardized$Stage <- ifelse(USGS_Standardized$Discharge_CFS<=CFS_Quantiles[2], 1, 
+  ifelse(USGS_Standardized$Discharge_CFS > CFS_Quantiles[2] & USGS_Standardized$Discharge_CFS <= CFS_Quantiles[4],2,
+  ifelse(USGS_Standardized$Discharge_CFS > CFS_Quantiles[4] & USGS_Standardized$DisDif2 == 1,3,
+  ifelse(USGS_Standardized$Discharge_CFS > CFS_Quantiles[4] & USGS_Standardized$DisDif2 == 0,4, NA))))
+
+# Remove fields with variables used for calculations
+remove(CFS_Quantiles)
 
 ```
 
 ```{r}
 USGS_Standardized %>%
- filter(DateTime2>as.POSIXlt.character("2015-10-01") 
+ filter(DateTime2>as.POSIXlt.character("2015-01-01") 
         & DateTime2 < as.POSIXlt.character("2015-10-15")) %>%
   filter(Discharge_CFS<100) %>%
-  ggplot(aes(x=DateTime2, y=Discharge_CFS, color=Stage24b))+
+  ggplot(aes(x=DateTime2, y=Discharge_CFS, color=Stage))+
   geom_point()
 ```
 
@@ -383,7 +378,8 @@ ecoli_data<- ecoli_data %>%
          ResultMeasureValue,
          ResultDetectionConditionText,
          ActivityTypeCode,
-         ActivityConductingOrganizationText)
+         ActivityConductingOrganizationText,
+         DistFromSonoita)
 
 ```
 
@@ -681,7 +677,7 @@ The columns are getting messy. Remove duplicates and nulls
 
 # Columns are organized so that the "metadata" columns are in the beginning. These will not be used for correlation views.
 data_Merge3 <- data_Merge2 %>%
-  select(ActivityConductingOrganizationText, MonitoringLocationIdentifier, QuantificationLimit, DailyFlowCount, DateTime2, StandardizedResult, Discharge_CFS, USGS_Staff, QuantificationLimit, Precipitation..in., Tmax..F., Tmin..F., Previous3Precip, Previous7Precip, Previous30Precip, Season, NinXTS, TOD)
+  select(ActivityConductingOrganizationText, MonitoringLocationIdentifier, QuantificationLimit, DailyFlowCount, DateTime2, StandardizedResult, Discharge_CFS, USGS_Staff, QuantificationLimit, Precipitation..in., Tmax..F., Tmin..F., Previous3Precip, Previous7Precip, Previous30Precip, Season, NinXTS, TOD, Stage, DistFromSonoita)
 
 # Remove old data.
 remove(data_Merge, data_Merge2, DailyClimate, Nin, NinXTS)
@@ -745,7 +741,7 @@ data_Merge3$ACO_Numeric <- ifelse(data_Merge3$ActivityConductingOrganizationText
 
 ## Begin looking at the correlation
 
-I want to look at nulls from the climate data. I think this will have an effect on my corrplot. With removed rows, I still have 896 to play with.
+I want to look at nulls from the climate data. I think this will have an effect on my corrplot. With removed rows, I still have ~900 to play with.
 ```{r}
 data_Merge3 <- na.omit(data_Merge3)
 ```
@@ -771,7 +767,7 @@ Use the *Training* data to train the models. Test data comes in for validation p
 ```{r}
 # Ensure that only numeric data is contained. There was a previous cleanup but it still contained metadata.
 traindata_numeric <- traindata %>%
-  select(c(6:14,16:18))
+  select(c("StandardizedResult", "Discharge_CFS", "USGS_Staff", "Precipitation..in.", "Tmax..F.", "Tmin..F.", "Previous3Precip", "Previous7Precip", "Previous30Precip", "NinXTS", "TOD", "Stage", "SeasonNumeric", "ACO_Numeric", "DistFromSonoita"))
 
 # I can look at pairs
 pairs(traindata_numeric)
@@ -785,15 +781,16 @@ cor <- cor(traindata_numeric)
 corrplot(cor, method = 'square', order = 'FPC', type = 'upper', diag = FALSE, addCoef.col="black", number.cex=0.75)
 ```
 
+```{r}
+cor2 <- cor(traindata %>%
+  select(c("StandardizedResult", "Previous30Precip", "Tmin..F.", "Discharge_CFS", "Stage","NinXTS", "TOD","ACO_Numeric", "DistFromSonoita")))
+
+corrplot(cor2, method = 'square', order = 'FPC', type = 'upper', diag = FALSE, addCoef.col="black", number.cex=0.75)
+```
+
 It is important to ensure that I do not include correlated predictors in this model. If I choose a precipitation variable, it should only be one. Same for temperature and discharge/staff. 
 
 Season and temperature are also extremely strongly correlated. It may make sense to use only one variable. 
-
-Currently I'm looking at:
-1. Previous 30 Precip - interesting that it has more of an effect than 7 an 3. Possibly something to do with flooding washing out? Or interactions when the water is extremely low and it hasn't rained in months?
-2. T min
-3. USGS Staff - there may be slightly more values between discharge and staff since discharge is sometimes questionable at high levels? Interesting that they are different by 0.1
-4. possibly NinXTS?
 
 ```{r}
 
@@ -801,4 +798,3 @@ Currently I'm looking at:
 
 Note for LAURA:
 What about distance from Sonoita. Number from north to south or vice versa?
-What about the rise/fall of stage?
