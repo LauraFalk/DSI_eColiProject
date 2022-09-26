@@ -746,6 +746,14 @@ I want to look at nulls from the climate data. I think this will have an effect 
 data_Merge3 <- na.omit(data_Merge3)
 ```
 
+Create the classifiers, 126 (FBC, geometric mean, minimum of four samples in 30 days), 235 (FBC, single sample ), 575 (PBC) according to EPA regulations for the state of Arizona. 
+
+```{r}
+data_Merge3$ecoli_235 <- ifelse(data_Merge3$StandardizedResult > 234.5,1,0)
+data_Merge3$ecoli_575 <- ifelse(data_Merge3$StandardizedResult > 574.5,1,0)
+```
+
+
 ## Data Exploration 2.0
 
 Now that I've looked at the overall data, make a test and train set to proceed.
@@ -767,9 +775,10 @@ Use the *Training* data to train the models. Test data comes in for validation p
 ```{r}
 # Ensure that only numeric data is contained. There was a previous cleanup but it still contained metadata.
 traindata_numeric <- traindata %>%
-  select(c("StandardizedResult", "Discharge_CFS", "USGS_Staff", "Precipitation..in.", "Tmax..F.", "Tmin..F.", "Previous3Precip", "Previous7Precip", "Previous30Precip", "NinXTS", "TOD", "Stage", "SeasonNumeric", "ACO_Numeric", "DistFromSonoita"))
+  select(c("StandardizedResult", "ecoli_235","ecoli_575", "Discharge_CFS", "USGS_Staff", "Precipitation..in.", "Tmax..F.", "Tmin..F.", "Previous3Precip", "Previous7Precip", "Previous30Precip", "NinXTS", "TOD", "Stage", "SeasonNumeric", "ACO_Numeric", "DistFromSonoita"))
 
 # I can look at pairs
+# Now that I've added more variables this isn't exactly useful.
 pairs(traindata_numeric)
 
 ```
@@ -782,19 +791,27 @@ corrplot(cor, method = 'square', order = 'FPC', type = 'upper', diag = FALSE, ad
 ```
 
 ```{r}
+# looking at only ecoli_575
 cor2 <- cor(traindata %>%
-  select(c("StandardizedResult", "Previous30Precip", "Tmin..F.", "Discharge_CFS", "Stage","NinXTS", "TOD","ACO_Numeric", "DistFromSonoita")))
+  select(c("ecoli_575", "Previous30Precip", "Tmin..F.", "Discharge_CFS", "Stage","NinXTS", "TOD","ACO_Numeric", "DistFromSonoita")))
 
 corrplot(cor2, method = 'square', order = 'FPC', type = 'upper', diag = FALSE, addCoef.col="black", number.cex=0.75)
+```
+```{r}
+# looking at only ecoli_235
+cor3<- cor(traindata %>%
+  select(c("ecoli_235", "Previous30Precip", "Tmin..F.", "Discharge_CFS", "Stage","NinXTS", "TOD","ACO_Numeric", "DistFromSonoita")))
+
+corrplot(cor3, method = 'square', order = 'FPC', type = 'upper', diag = FALSE, addCoef.col="black", number.cex=0.75)
+```
+```{r}
+# This looks at both classifications together. Repeat of previous
+cor4<- cor(traindata %>%
+  select(c("ecoli_235", "ecoli_575", "Previous30Precip", "Tmin..F.", "Discharge_CFS", "Stage","NinXTS", "TOD","ACO_Numeric", "DistFromSonoita")))
+
+corrplot(cor4, method = 'square', order = 'FPC', type = 'upper', diag = FALSE, addCoef.col="black", number.cex=0.75)
 ```
 
 It is important to ensure that I do not include correlated predictors in this model. If I choose a precipitation variable, it should only be one. Same for temperature and discharge/staff. 
 
 Season and temperature are also extremely strongly correlated. It may make sense to use only one variable. 
-
-```{r}
-
-```
-
-Note for LAURA:
-What about distance from Sonoita. Number from north to south or vice versa?
