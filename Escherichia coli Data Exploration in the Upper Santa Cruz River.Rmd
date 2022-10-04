@@ -20,61 +20,63 @@ opts_chunk$set(echo = TRUE)
 ## Processing the USGS File
 
 ### Notes
-#This data is from the USGS continuous monitoring gage of the Santa Cruz River at Tubac. Data is all published and available for public use.
+This data is from the USGS continuous monitoring gage of the Santa Cruz River at Tubac. Data is all published and available for public use.
 
 ### Code
-#I have commented out the data pull for USGS data. It is many years and takes lots of time to grab all 300k records when running this script. To save time, I've outputted the result of: 
+I have commented out the data pull for USGS data. It is many years and takes lots of time to grab all 300k records when running this script. To save time, I've outputted the result of: 
 readNWISuv(site_id,c('00060','00065'), "2009-07-01","2022-08-30", "America/Phoenix")
 as USGS_09481740.CSV and saved this within the raw data folder on 9/12/2022.
 
-#Original code may be un-commented and re-run if desired. Data after 1/10/2022 is currently provisional and is still subject to change during USGS QAQC procedures.
-
-#Triple hashes (###) are meant to indicate code that has been commented-out or added in order to expedite the processing (by use of a saved csv file of processed data rather than repeating the processing each time). If code is fully automated, these chunks are to be altered.
+Triple hashes (###) within code blocks are meant to indicate code that has been commented-out or added in order to expedite the processing (by use of a saved csv file of processed data rather than repeating the processing each time). If code is fully automated, these chunks are to be altered.
+# Original code may be un-commented and re-run if desired. Data after 1/10/2022 are currently provisional and is still subject to change during USGS QAQC procedures.
 ```{r}
-#### Inputs formatted for read NWIS function.
-####site_id <- '09481740'
-####startDate = "2009-06-01"
-####endDate = "2022-08-30"
+# Inputs formatted for read NWIS function.
+site_id <- '09481740'
+startDate = "2009-06-01"
+endDate = "2022-08-30" # End date is 8/30/2022 to avoid null data at this time (9/5/2022)
 
-# Input timezone for NWIS and POSIXT functions
-tz="America/Phoenix" # End date is 8/30/2022 to avoid null data at this time (9/5/2022)
+# Input timezone for read NWIS and POSIXT functions
+tz="America/Phoenix" 
 
-#### creates table in R
-####USGS_Raw <- readNWISuv(site_id,c('00060','00065'), startDate,endDate, tz)
+#### Creates table in R
+###USGS_Raw <- readNWISuv(site_id,c('00060','00065'), startDate,endDate, tz)
 
-###Read in raw data
+###Read in raw data. If using code above, do not run this line.
 USGS_Raw <- read.csv("Data/Raw/USGS_09481740.csv")
 ```
 
-#2015 had some times that were off by a few minutes from the normal 15- minute interval. This will ensure that everything is standardized. Values are rounded to the nearest 15-minute interval.
+2015 had some times that were off by a few minutes from the normal 15- minute interval. This will ensure that everything is standardized. Values are rounded to the nearest 15-minute interval.
 ```{r}
 # Create a New Dataframe to edit. I prefer to keep the old data available during this process in order to be able to quickly compare.
 USGS_Standardized <- USGS_Raw
 
-# Round data and put into a format for merging. Used DateTime2 throughout this notebook to indicate the processed DateTime.
+# Round data and put into a format for merging. 
+# DateTime2 is used throughout this notebook to indicate the processed DateTime.
 USGS_Standardized$DateTime2 <- round_date(as.POSIXct(USGS_Standardized$dateTime), "15 minutes")
 USGS_Standardized$DateTime2 <-as.POSIXct(format(USGS_Standardized$DateTime2, format = '%Y-%m-%d %H:%M'), tz = tz)
 ```
 
-#This indicates that there are duplicate entries which have arisen from the 15-minute standardization. #This is because the data was not collected on the standard 15-minute interval. The separate values were rounded to the same value.
+There are duplicate entries which have arisen from the 15-minute standardization, continuing the issues from 2015. Some separate values could be rounded to the same DateTime.
 ```{r}
-# Loaded plyr for later testing and it made this piece of the code upset. "dplyr::" should not be necessary, but it avoids issues.
-USGS_Standardized %>% group_by(DateTime2) %>% dplyr::summarise(n=sum(n())) %>% filter(n>1)
+# Determines how many values are affected by the rounding process (and any other duplicates)
+USGS_Standardized %>% 
+  group_by(DateTime2) %>% 
+  summarise(n=sum(n())) %>% filter(n>1)
 ```
 
 
-#The following chunk creates a mean of the values (which will be within 15 minutes of each other, so it is assumed the values will be similar enough to merge) to use in place of the two readings.
+The duplicate DateTime can be fixed by using the mean of the values (they are within 15 minutes of one-another and should not be hugely variable). The mean will be used in place of the original two values.
 ```{r}
-# This summarizes the flow column by the rounded DateTime. It will take the average of the two values if multiples exist.
+# Summarizes the flow column by the rounded DateTime. It will take the average of the two values if multiples exist.
 USGS_Standardized_append <- USGS_Standardized %>% group_by(DateTime2) %>% summarise(mean(X_00060_00000))
 
-# Rename the column to something more useful.
+# Rename the column to something meaningful.
 setnames(USGS_Standardized_append,old=c("mean(X_00060_00000)"),new=c("Discharge_CFS"))
 
-# Merge the rounded data back in and rename the column name to something more useful.
+# Merge the rounded data back in and rename the column name to something meaningful.
 USGS_Standardized<- merge(x=USGS_Standardized,y=USGS_Standardized_append, by="DateTime2",all.x=TRUE, all.y = FALSE)
 
-#Remove the pre-averaging flow column. This allows to remove duplicates from the append pairs created above.
+# Remove the pre-averaging flow column.
 USGS_Standardized <- USGS_Standardized %>%
   subset(select = -c(X_00060_00000)) %>%
   distinct(DateTime2, Discharge_CFS, .keep_all = TRUE)
@@ -87,34 +89,40 @@ remove(USGS_Standardized_append)
 
 ```
 
-#Though the data is nearly complete, there are still some missing values for the 15 minute intervals. #Currently the missing rows are not included in the dataframe.
-#This will create a full time series to include indicator of no data.
+Though the data is nearly complete, there are still some missing values for the 15 minute intervals. Currently the missing rows are not included in the dataframe.
+
+This will create a full time series to include indicator of no data.
 ```{r}
 # Create the time series, formatted as POSIXct
 TimeSeries <- data.frame(seq.POSIXt(as.POSIXct(format("2009-06-01 0:00",format = '%m/%d/%y %H:%M'), tz = tz), as.POSIXct(format("2022-08-30 0:00",format = '%m/%d/%y %H:%M'), tz = tz), by="15 min"))
 
 # Rename the Column DateTime2 to indicate properly formatted column.
 colnames(TimeSeries)[1] = "DateTime2"
-# Follow through on the name and format this bad boy.
+
+# Follow through  - properly format DateTime2
 TimeSeries$DateTime2 <-as.POSIXct(format(TimeSeries$DateTime2, format = '%Y-%m-%d %H:%M'), tz = tz)
 
-#Left join data with time series, sort by DateTime2
+# Left join data with time series, sort by DateTime2
 USGS_Standardized <- merge(x=TimeSeries,y=USGS_Standardized,by="DateTime2",all.x=TRUE, all.y = FALSE)
 
 # Remove the created time series. Data has been merged
 remove(TimeSeries)
 ```
-#Notice that 2009-07-01 04:30:00 is now a row which indicates no data.
 
-
-#We now have to handle the nulls we created.
+Look at the data to ensure that it is doing what we want. I know that 7/1/2009 at 04:30 has no data.
 ```{r}
-# This tests to see how many nulls are present in the current dataset.
+# View 7/1/2009 04:30
+USGS_Standardized %>%
+  filter(DateTime2 == '2009-07-01 04:30:00')
+```
+Now that nulls are created, lets try and reduce them.
+```{r}
+# Tests to see how many nulls are present in the current dataset.
 # 9/5/2022: 40548 records are null
 count(USGS_Standardized %>%
  filter(is.na(Discharge_CFS)))
 ```
-
+##Laura start here
 #I think I should be able to fill some of the nulls by taking the average of the two surrounding values. 
 ```{r}
 # This column is a dummy column which allows me to count more easily in the next block.
