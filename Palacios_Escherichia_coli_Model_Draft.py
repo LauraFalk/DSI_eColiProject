@@ -77,5 +77,24 @@ from sklearn.feature_selection import f_classif
 from sklearn.metrics import precision_score, recall_score, roc_curve
 
 ## Read in the data
-eoli_test = pd.read_csv('Data\Processed\ecoli_test.csv')
-ecoli_train = pd.read_csv('Data\Processed\ecoli_train.csv')
+ecoli_csv = pd.read_csv('Data\Processed\ecoli_attributed.csv')
+
+#Drop unecessary columns.
+ecoli_csv = ecoli_csv.drop(['Unnamed: 0'], axis=1)
+
+# Create the Array
+ecoli_array = np.array(ecoli_csv)
+
+# Create the Array for each criteria (236 and 575)
+ecoli_x = ecoli_array[:, 0:-2]
+ecoli_236 = ecoli_test[:, -2]
+ecoli_575 = ecoli_test[:, -1]
+
+#Test to ensure this is working
+pd.set_option('display.max_columns', None)
+print(ecoli_csv.loc[[11]])
+print(ecoli_x[11])
+print(ecoli_236[11])
+print(ecoli_575[11])
+
+# LAURA this isn't working, why??
