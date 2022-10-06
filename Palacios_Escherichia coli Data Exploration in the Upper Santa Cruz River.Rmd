@@ -122,14 +122,15 @@ Now that nulls are created, lets try and reduce them.
 count(USGS_Standardized %>%
  filter(is.na(Discharge_CFS)))
 ```
-##Laura start here
-#I think I should be able to fill some of the nulls by taking the average of the two surrounding values. 
+
+We should be able to fill some of the nulls by taking the average of the two surrounding values. 
 ```{r}
-# This column is a dummy column which allows me to count more easily in the next block.
+
 USGS_Standardized$date <- as_date(USGS_Standardized$DateTime2)
+# Create a dummy column.
 USGS_Standardized$count <- 1
 
-# This counts the number of readings per day
+# Count the number of readings per day
 TimeFlag <- USGS_Standardized %>%
   filter(!is.na(Discharge_CFS)) %>%
   group_by(date) %>%
@@ -150,7 +151,7 @@ remove(TimeFlag)
 
 ```
 
-#Start to fill null data where applicable. This will fill in all data into a new column.
+Start to fill null data where applicable. This will fill in all data into a new column.
 ```{r}
 #Filter for columns with a daily flow count greater than 88 (no more than 2 hours per day missing.)
 USGS_Standardized_Fill <-
@@ -164,14 +165,13 @@ USGS_Standardized_Fill$Filled <-  na.approx(USGS_Standardized_Fill$Discharge_CFS
 USGS_Standardized <- right_join(USGS_Standardized_Fill,USGS_Standardized)
 
 # Remove the old data
-remove(USGS_Standardized_Fill)
+remove(USGS_Standardized_Fill,USGS_Raw)
 
 ```
 
-#Check how many nulls there are now that some of the data is filled. More data filled would mean more assumptions.
-# 9/12/2022: Current count of null data is decreased to 37385
+Check how many nulls there are now that some of the data is filled. More data filled would mean more assumptions.
+9/12/2022: Current count of null data is decreased to 37385
 ```{r}
-
 # Fill in the un-filled values
 USGS_Standardized$Filled<- ifelse(is.na(USGS_Standardized$Discharge_CFS) == TRUE,USGS_Standardized$Filled,USGS_Standardized$Discharge_CFS)
 
@@ -179,19 +179,16 @@ count(USGS_Standardized %>%
  filter(is.na(Filled)))
 
 ```
-#Clean up the columns 
+Clean up the columns nd environment
 ```{r}
-# Remove the un-filled discharge column
+#Remove the un-filled discharge column
 USGS_Standardized <-  USGS_Standardized %>%
   subset(select = -c(Discharge_CFS))
 
-# Rename to something meaningful
+#Rename to something meaningful
 setnames(USGS_Standardized,old=c("Filled"),new=c("Discharge_CFS"))
-```
 
-#Remove Raw columns
-```{r}
-remove(USGS_Raw)
+
 ```
 
 #To determine if the river is rising, use quantiles
@@ -204,10 +201,8 @@ USGS_Standardized <- USGS_Standardized %>%
 # This will create a binary variable or either rise of fall. Rise = 1, fall = 0. It will allow me to more easily create summary statistics.
 USGS_Standardized$DisDif2 <- ifelse(USGS_Standardized$DisDif>0,1,0)
 
-
-#USGS_Standardized$Stage24 <- rollsumr(USGS_Standardized$DisDif2, k = 96, fill = NA)
-# 1 = low flow, 2 = stable, 3 = high rising, 4 = high falling.
-
+# Create a numeric classifier. 
+# 1 = Low Flow, 2 = Base flow, 3 = High and Rising Flow 4 = High and Falling Flow
 USGS_Standardized$Stage <- ifelse(USGS_Standardized$Discharge_CFS<=CFS_Quantiles[2], 1, 
   ifelse(USGS_Standardized$Discharge_CFS > CFS_Quantiles[2] & USGS_Standardized$Discharge_CFS <= CFS_Quantiles[4],2,
   ifelse(USGS_Standardized$Discharge_CFS > CFS_Quantiles[4] & USGS_Standardized$DisDif2 == 1,3,
@@ -218,7 +213,18 @@ remove(CFS_Quantiles)
 
 ```
 
+
+Visualize the data to ensure that it is being accurately classified.
 ```{r}
+# Graph all flow class data
+# Missing values error is expected.
+USGS_Standardized %>%
+ filter(DateTime2>as.POSIXlt.character("2015-01-01") 
+        & DateTime2 < as.POSIXlt.character("2015-10-15")) %>%
+  ggplot(aes(x=DateTime2, y=Discharge_CFS, color=Stage))+
+  geom_point()
+
+# Filter to data below 100 to better view the pattern. 
 USGS_Standardized %>%
  filter(DateTime2>as.POSIXlt.character("2015-01-01") 
         & DateTime2 < as.POSIXlt.character("2015-10-15")) %>%
@@ -231,55 +237,51 @@ USGS_Standardized %>%
 ## Merging the E. coli data sources and limiting to sample size.
 
 ### Data Retrieval
-#I have raw data from the water quality portal (EPA) a summary of ADEQ, USGS, FOSCR and NPS (Tumacacori) data along with a download of NPS-SODN quarterly sampling data (approximately 35 samples). 
+I have raw data from the water quality portal (EPA) a summary of ADEQ, USGS, FOSCR and NPS (Tumacacori) data along with a download of NPS-SODN quarterly sampling data (approximately 35 samples). 
 
-#Data location and security: https://www.epa.gov/waterdata/water-quality-data. Data is published and public. SODN data is unpublished and should be considered provisional for this project.
+Data location and security: https://www.epa.gov/waterdata/water-quality-data. Data is published and public. SODN data is unpublished and should be considered provisional for this project.
 
-#Storet: https://www.waterqualitydata.us/ 
-#Country: United States of America (NWIS, STEWARDS, STORET)
-#State: Arizona (NWIS, STORET)
-#County: US, Arizona, Santa Cruz County (NWIS, STORET)
-#Site type: Stream (NWIS, STEWARDS, STORET)
-#Date from: 7/1/2009
-#Date to: 8/30/2022
-#Sample Media: Water (NWIS, STEWARDS, STORET)
-#Characteristic Group: Microbiological (NWIS, Storet)
-#Data profiles: Sample results (biological metadata)
+Storet: https://www.waterqualitydata.us/ 
+Country: United States of America (NWIS, STEWARDS, STORET)
+State: Arizona (NWIS, STORET)
+County: US, Arizona, Santa Cruz County (NWIS, STORET)
+Site type: Stream (NWIS, STEWARDS, STORET)
+Date from: 7/1/2009
+Date to: 8/30/2022
+Sample Media: Water (NWIS, STEWARDS, STORET)
+Characteristic Group: Microbiological (NWIS, Storet)
+Data profiles: Sample results (biological metadata)
 
-#SODN: Data was pulled using a sql query on a DOI/NPS server. More information can be provided by the SODN data manager, currently Helen Thomas.
+SODN: Data was pulled using a sql query on a DOI/NPS server. More information can be provided by the SODN data manager, currently Helen Thomas. Data was manually manipulated to match the storet output prior to reading into R.
 
 ### Sampling Locations Information
 
-#Storet: https://www.waterqualitydata.us/ 
-#Country: United States of America (NWIS, STEWARDS, STORET)
-#State: Arizona (NWIS, STORET)
-#County: US, Arizona, Santa Cruz County (NWIS, STORET)
-#Site type: Stream (NWIS, STEWARDS, STORET)
-#Date from: 7/1/2009
-#Date to: 8/30/2022
-#Sample Media: Water (NWIS, STEWARDS, STORET)
-#Characteristic Group: Microbiological (NWIS, Storet)
-#Data profiles: Site Data Only
+Storet: https://www.waterqualitydata.us/ 
+Country: United States of America (NWIS, STEWARDS, STORET)
+State: Arizona (NWIS, STORET)
+County: US, Arizona, Santa Cruz County (NWIS, STORET)
+Site type: Stream (NWIS, STEWARDS, STORET)
+Date from: 7/1/2009
+Date to: 8/30/2022
+Sample Media: Water (NWIS, STEWARDS, STORET)
+Characteristic Group: Microbiological (NWIS, Storet)
+Data profiles: Site Data Only
 
-#SODN: Single sampling location coordinates were provided by NPS and manually added to the storet download CSV location file.
+SODN: Single sampling location coordinates were provided by NPS and manually added to the storet download CSV location file.
 
 ### Sampling Location processing
-#The storet download file was placed into Arcmap and points within the sample range were exported to the included raw csv file. The locations for data download were chosen from the Upper Santa Cruz River. Locations are limited to North of the NIWWTP and Sonoita Creek confluence to avoid data noise from two likely point sources. All locations sampled should contain the same water without significant other inputs
+The storet download file was placed into Arcmap and points within the sample range were exported to the included raw csv file. The locations for data download were chosen from the Upper Santa Cruz River. Locations are limited to North of the NIWWTP and Sonoita Creek confluence to avoid data noise from two likely point sources. All locations sampled should contain the same water without significant other inputs
 
 ### Below, The data was limited to:
-#1. sample location (above)
-#2. E. coli only (not total coliforms)
-#3. same method (EPA Standard Method 9223B, Colilert, sampling procedures)
-#4. comparable date range (Post 2009 NIWWTP significant upgrade project)
+1. sample location (above)
+2. E. coli only (not total coliforms)
+3. same method (EPA Standard Method 9223B, Colilert, sampling procedures)
+4. comparable date range (Post 2009 NIWWTP significant upgrade project)
 
 
 ## Code
-#Read in the raw data files
+Read in the raw data files
 ```{r}
-####This reads in the checkpoint file, if created.
-####USGS_Standardized <- read.csv("Data/Processed/USGS_Standardized.csv")
-
-# This raw file contains the Storet and SODN data. The 30 SODN records were appended manually.
 RawStoret <- "Data/Raw/ecoli_Storet_Raw.csv"
 RawSODN <- "Data/Raw/ecoli_SODN_Raw.csv"
 RawLocation <- "Data/Raw/ecoli_Locations_StoretandSODN.csv"
@@ -289,9 +291,8 @@ RawSODN_data <- read.csv(RawSODN)
 Locations <- read.csv(RawLocation)
 ```
 
-#Merge the SODN and Storet Raw Data files
+Merge the SODN and Storet Raw Data files
 ```{r}
-# Merge the two dataframes together. SODN raw data was outputted to match the STORET format. Fields were manually filled by data management.
 ecoli_data <- rbind(RawStoret_data, RawSODN_data)
 
 # Use Janitor to clean null columns
@@ -302,33 +303,32 @@ remove(RawStoret_data, RawSODN_data)
 ```
 
 
-#Now we must clean up the data further.
-#Keep only the columns which contain E. coli data. Other colifoms or enterolert (etc) procedures are within the STORET output. 
+Now we must clean up the data further.
+Keep only the columns which contain E. coli data. Other colifoms or enterolert (etc) procedures are within the STORET output. 
 
-#Note: Fecal coliforms may also be applicable, but for the initial study I would like to stick solely to Escherichia coli. Nick Paretti (USGS) indicated that this maybe a better options due to the increased varaiblility. Fecal coliforms (non-species specific) have maximum results much more often and may be less meaningful.
+Note: Fecal coliforms may also be applicable, but for the initial study I would like to stick solely to Escherichia coli. Nick Paretti (USGS) indicated that this maybe a better options due to the increased varaiblility. Fecal coliforms (non-species specific) have maximum results much more often and may be less meaningful.
 ```{r}
-# STORET has standardized the output as "Excherichia coli"
+# STORET has standardized the output as "Escherichia coli"
 ecoli_data <- ecoli_data[ecoli_data$CharacteristicName == "Escherichia coli", ] 
 ```
 
-#I also want to remove anything with a time zone other than MST. I cannot verify if this is a typo or an actual data point.
-#With the 9/13 data pull this is only one record.
+I also want to remove anything with a time zone other than MST. I cannot verify if this is a typo or an actual data point.
+With the 9/13 data pull this is only one record.
 ```{r}
 # STORET has standardized the output as "Excherichia coli"
 ecoli_data <- ecoli_data[ecoli_data$ActivityStartTime.TimeZoneCode == "MST", ] 
 ```
 
-#Remove columns with methods other than 9223B
+Remove columns with methods other than 9223B or a synonym.The methods are not standardized in STORET. It is assumed that all forms of Colilert and SM9223B represent comparable results. Colilert comes in both an 18 and 24 hour test, but they are assumed to provide a comparable output. 
 ```{r}
-# The methods are not standardized in STORET. It is assumed that all forms of Colilert and SM9223B represent comparable results. Colilert comes in both an 18 and 24 hour test, but they are assumed to provide a comparable output. 
 ecoli_data <- ecoli_data[ecoli_data$ResultAnalyticalMethod.MethodName == "E coli, water, Colilert (24-28)"|
                                     ecoli_data$ResultAnalyticalMethod.MethodName ==  "COLILERT (EDBERG)"|
                                     ecoli_data$ResultAnalyticalMethod.MethodName ==  "COLILERT"|
                                     ecoli_data$ResultAnalyticalMethod.MethodName ==  "SM 9223B", ] 
 ```
 
-#Remove dates before 2009 when the plant was updated. June 2009
-#Note: SODN data file had a different date format. CSV output from SODN was updated on 9/13/2022
+Remove dates before 2009 when the plant was updated. June 2009
+Note: SODN data file had a different date format. Raw CSV output from SODN was updated on 9/13/2022
 ```{r}
 ecoli_data$DateAsDate <- ymd(ecoli_data$ActivityStartDate,tz=tz)
 ecoli_data$DateAsDate <-format(as.POSIXct(ecoli_data$ActivityStartDate),format='%Y-%m-%d')
@@ -336,20 +336,19 @@ ecoli_data <- ecoli_data[ecoli_data$DateAsDate >= "2009-07-01", ]
 ```
 
 
-#Merge the files based on monitoring location identifier.Monitoring locations were outputted from an ARCGIS lasso of the range between the NIWWTP/Sonoita Creek inputs and the end of the Upper Santa Cruz River.
+Merge the files based on monitoring location identifier (outputted by STORET).Monitoring locations were outputted from an ARCGIS lasso of the range between the NIWWTP/Sonoita Creek inputs and the end of the Upper Santa Cruz River. The single SODN monitoring location was manually added to the end of this file before import.
 
-#This will decrease the number of rows in the dataset because it excludes measurements outside of the study range (namely the sonoita creek data)
+This will decrease the number of rows in the dataset because it excludes measurements outside of the study range (namely the sonoita creek data)
 ```{r}
-# Merge on the Monitoring Location Identifier (outputted by STORET). The single SODN monitoring location was manually added to the end of this file before import.
 ecoli_data<- merge(ecoli_data, Locations, by = c("MonitoringLocationIdentifier"))
 ```
 
-#Remove unnecessary tables. 
+Remove unnecessary tables. 
 ```{r}
 remove(Locations, RawLocation, RawSODN, RawStoret)
 ```
 
-#Remove any null columns created by reducing the dataset size.
+Remove any null columns created by reducing the dataset size.
 ```{r}
 # Use Janitor to clean null columns
 ecoli_data<- remove_empty(ecoli_data, c("cols"))
@@ -357,29 +356,39 @@ ecoli_data<- remove_empty(ecoli_data, c("cols"))
 
 ## Further processing of the e. Coli data
 
-#Remove columns that contain only 1 entry
+Remove columns that contain only 1 entry. If all entries are the same value it will not be useful for classification. 
 ```{r}
-# Count the number of distinct values. If all values are the same, this will not be used for analysis and column is dropped.
+# Count the number of distinct values.
 ecoli_data <- keep(ecoli_data, ~n_distinct(.) > 1)
 ```
 
-#View the data. There are still columns I don't need.
+View the data. There are still columns I don't need.
 ```{r}
-# Use the summary function to look at what data exists. Commented out because it is unnecessary.
+# Use the summary function to look at what data exists. 
+#Commented out because it is not necessary for continued data processing.
 #summary(ecoli_data)
 ```
 
-#Take out columns that don't have meaningful data. Numeric First
+Take out columns that don't have meaningful data.
+Date - date of sample
+ActivityStartTime.Time - time of sample
+MonitoringLocationIdentifier - Unique location ID
+ResultMeasureValue - reported measured value
+ResultDetectionConditionText - identifies above or below detection limits. Currently incomplete/unstandardized.
+ActivityConductingOrganizationText - Whose fault this measurement is
+ActivityTypeCode - QAQC sample, field sample, etc.
+DistFromSonoita - Roughly estimated linear distance (as the crow flies)from the Sonoita input to the sampling location
+
 ```{r}
 # Select only columns that I want to use for analysis
 ecoli_data<- ecoli_data %>%
   select(DateAsDate, 
          ActivityStartTime.Time,  
          MonitoringLocationIdentifier,
-         HydrologicCondition,
-         HydrologicEvent,
-         ResultValueTypeName,
-         ResultStatusIdentifier,
+         #HydrologicCondition,
+         #HydrologicEvent,
+         #ResultValueTypeName,
+        # ResultStatusIdentifier,
          ResultMeasureValue,
          ResultDetectionConditionText,
          ActivityTypeCode,
@@ -388,35 +397,31 @@ ecoli_data<- ecoli_data %>%
 
 ```
 
-#This column will indicate if the data is above or below detection limits. 
+Create a column to indicate if the data is above or below detection limits. 
 ```{r}
 # The maximum test capacity is 2419 MPN. Above this value was a dilution technique.
-ecoli_data$QuantificationLimit <- ifelse(ecoli_data$ResultMeasureValue > 2419 | ecoli_data$ResultDetectionConditionText == "Present Above Quantification Limit", "Present Above Quantification Limit", "Value")
+ecoli_data$QuantificationLimit <- ifelse(ecoli_data$ResultMeasureValue > 2419.6 | ecoli_data$ResultDetectionConditionText == "Present Above Quantification Limit", "Present Above Quantification Limit", "Value")
 
 # This will standardize the non-detects
 ecoli_data$QuantificationLimit <- ifelse(ecoli_data$ResultDetectionConditionText == "Present Below Quantification Limit"|ecoli_data$ResultDetectionConditionText == "Not Detected", "Present Below Quantification Limit", ecoli_data$QuantificationLimit)
 ```
 
-#Remove QAQC samples
+Remove QAQC samples
 ```{r}
 # Blanks and replicates will be discounted for this analysis. Only field samples should remain.
 ecoli_data <- ecoli_data %>%
   filter(ActivityTypeCode != "Quality Control Sample-Field Replicate" & ActivityTypeCode !="Quality Control Sample-Equipment Blank")
-
-# this is just a check to ensure that this leads me to the same count as the samples only table.
-#ecoli_data %>%
-#count(ActivityTypeCode == "Sample-Routine")
 ```
 
-#I want to create a column of data standardized to the detection limit of sodn sampling (2420). Some samples were much higher than that because they were diluted, but it appears not all of them were. 
+I want to create a column of data standardized to the detection limit of SODN sampling (2419.6). Some samples were much higher than that because they were diluted, but it appears not all of them were. 
 ```{r}
 ecoli_data$StandardizedResult <- ecoli_data$ResultMeasureValue
-ecoli_data$StandardizedResult <- ifelse(ecoli_data$QuantificationLimit == "Present Above Quantification Limit", 2420, ecoli_data$StandardizedResult)
+ecoli_data$StandardizedResult <- ifelse(ecoli_data$QuantificationLimit == "Present Above Quantification Limit", 2419.6, ecoli_data$StandardizedResult)
 
 ecoli_data$StandardizedResult <- ifelse(ecoli_data$QuantificationLimit == "Present Below Quantification Limit",0, ecoli_data$StandardizedResult)
 
 ecoli_data %>%
-  count(StandardizedResult == 2420)
+  count(StandardizedResult == 2419.6)
 # I currently have 431 maximum results.
 
 ecoli_data %>%
@@ -440,8 +445,7 @@ ecoli_data %>%
 # There are no NA values
 ```
 
-
-#Remove unnecessary, unstandardized columns.
+Remove unnecessary, unstandardized columns.
 ```{r}
 ecoli_data<- ecoli_data %>%
   select(-ResultMeasureValue,
@@ -451,9 +455,13 @@ ecoli_data<- ecoli_data %>%
 
 
 ## Combine the ecoli, USGS, and environmental variable data.
+USGS - discharge and stage data
+ClimateAnalyzer (ClimateAnalyzer.org) - Tmax, Tmin and precip
+NOAA (https://psl.noaa.gov/enso/climaterisks/years/top24enso.html) - El Nino / La Nina
+National Park Service Streams Monitoring Protocol (NPS.GOV/SODN) - Seasonal Data
 
 
-#step. Merge the ecoli data with the USGS (flow) data.
+Merge the ecoli data with the USGS (flow) data.
 ```{r}
 # Ensure that this is in the correct time format. Always problematic, so this is over-coded to ensure success.
 ecoli_data$DateTime2 <- as.POSIXct(format(paste(ecoli_data$DateAsDate,ecoli_data$ActivityStartTime.Time), format = '%Y-%m-%d %H:%M'), tz = tz)
@@ -470,22 +478,22 @@ data_Merge %>%
 # 75 records are still without discharge. this is the one I care the most about.
 ```
 
-#Remove raw data, now merged
+Remove raw data, now merged
 ```{r}
 remove(USGS_Standardized, ecoli_data)
 ```
 
 
-#Remove the nulls from the merge. This is performed here rather than by using a sided join so that I may decide to do something different later on.
+Remove the nulls from the merge.
+Total remaining after removoal is 1139 on 9/13/22.
 ```{r}
-### Count is 1139
 data_Merge2 <- data_Merge %>%
   filter(!is.na(Discharge_CFS))
   
 ```
 
 
-#Look at what the data currently looks like. The red line is the actual standard for warm water effluent in AZ. The blue dotted line indicates the state standard for an average of three+ measurements. It is not technically applicable here, but gives a baseline. It may  be used to flag "Concerning-but-not-technically-bad" levels of E. coli.
+Look at what the data currently looks like. The red line is the actual standard for warm water effluent in AZ. The blue dotted line indicates the state standard for an average of three+ measurements. It is not technically applicable here, but gives a baseline. It may  be used to flag "Concerning-but-not-technically-bad" levels of E. coli.
 ```{r}
 data_Merge2 %>%
   ggplot(aes(x=Discharge_CFS, y=StandardizedResult)) +
@@ -496,7 +504,7 @@ data_Merge2 %>%
                 color = "red", size=0.2)
 ```
 
-#Now I want to see what it looks like without the outlying discharge values.
+Now I want to see what it looks like without the outlying discharge values.
 ```{r}
 data_Merge2 %>%
   filter(Discharge_CFS < 250) %>%
@@ -507,7 +515,8 @@ data_Merge2 %>%
   geom_hline(yintercept=235, linetype="dashed", 
                 color = "red", size=0.2)
 ```
-#Now I want to see what it looks like without the outlying discharge values. And one more for good measure.
+Now I want to see what it looks like without the outlying discharge values.
+None of these graphs appear to have a random distribution, but it is muddied.
 ```{r}
 data_Merge2 %>%
   filter(Discharge_CFS < 150) %>%
@@ -518,15 +527,13 @@ data_Merge2 %>%
   geom_hline(yintercept=235, linetype="dashed", 
                 color = "red", size=0.2)
 ```
-#well, it definitely doesn't look randomly distributed.
 
 
-#Let's add some air temperature up in here up in here.
+
+Let's add some air temperature up in here, up in here.
 ```{r}
-# Raw file location
+# Read in file 
 Rawclimate <- "Data/Raw/ClimateAnalyzer_DailySummaryStats_Raw.csv"
-
-# Read in raw file.
 DailyClimate <- read.csv(Rawclimate, skip = 3)
 DailyClimate <- head(DailyClimate, - 1)
 
@@ -534,20 +541,23 @@ DailyClimate <- head(DailyClimate, - 1)
 remove(Rawclimate)
 ```
 
-#What about the sum of previous three-days precipitation
+What about the sum of previous three-days precipitation
 ```{r}
 DailyClimate$Previous3Precip <-  rollsumr(DailyClimate$Precipitation..in., k = 3, fill = NA)
 DailyClimate$Previous7Precip <-  rollsumr(DailyClimate$Precipitation..in., k = 7, fill = NA)
 DailyClimate$Previous30Precip <-  rollsumr(DailyClimate$Precipitation..in., k = 30, fill = NA)
 ```
 
-
+Fix the date.
 ```{r}
 DailyClimate$DateAsDate <- str_sub(DailyClimate$Date,-10,-1)
 DailyClimate$DateAsDate <-as.POSIXct(DailyClimate$DateAsDate, format = "%m/%d/%Y", tz = tz)
 ```
 
-#merge together with other data
+Merge together with other data
+
+As of 9/13/2022 we have 113 more missing Tmax datapoints. I could possibly manipulate this file to clean nans but I'm not sure how comfortable I feel about this. 
+LAURA check in on this with expert.
 ```{r}
 data_Merge2$DateAsDate <-as.POSIXct(data_Merge2$DateAsDate, format = "%Y-%m-%d", tz = tz)
 
@@ -556,13 +566,14 @@ data_Merge2<- left_join(data_Merge2,
                           DailyClimate, by = c("DateAsDate"))
 
 
-
 data_Merge2 %>%
   filter(is.nan(Tmax..F.))
-# we have 113 more missing Tmax datapoints. I could possibly manipulate this file to clean nans but I'm not sure how comfortable I feel about this. LAURA check in on this with expert.
+
 ```
 
-#Graph again
+Graph again
+This isn't as great as I thought it would be. 
+Google says temps of 39-113°F are survivable for e. coli and ideal is 98.6°F. THe majority of the samples are survivable.
 ```{r}
 data_Merge2 %>%
   filter(!is.nan(Tmax..F.)) %>%
@@ -573,10 +584,8 @@ data_Merge2 %>%
   geom_hline(yintercept=235, linetype="dashed", 
                 color = "red", size=0.2)
 ```
-#This isn't as great as I thought it would be. 
-#Google says temps of 39-113°F are survivable for e. coli. ideal is 98.6°F.
-
-
+Graph TMin.
+It is of note that the max only happens above freezing. This may actually be more meaningful than Tmax. The minimum survivable temperature likely has a significant impact on the buggies.
 ```{r}
 data_Merge2 %>%
   filter(!is.nan(Tmin..F.)) %>%
@@ -587,9 +596,8 @@ data_Merge2 %>%
   geom_hline(yintercept=235, linetype="dashed", 
                 color = "red", size=0.2)
 ```
-#It is of note that the max only happens above freezing. This may actually be more meaningful.
 
-#There is probably a better source for precip, but I'd like to take a look at it. It may be correlated to flow. I'll have to check this later.
+There is probably a better source for precipication, but I'd like to take a look at it. It may be correlated to flow. I'll have to check this later.
 ```{r}
 data_Merge2 %>%
   filter(!is.nan(Precipitation..in.)) %>%
@@ -600,11 +608,11 @@ data_Merge2 %>%
   geom_hline(yintercept=235, linetype="dashed", 
                 color = "red", size=0.2)
 ```
-#Now I want to look at season. According to the NPS protocol the seasons in southern Arizona are:
-#Fall (October 1 - December 30)
-#Winter (January 1 - March 30)
-#Spring (April 1 - June 30)
-#Monsoon (July 1 - Sept 30)
+Now I want to look at season. According to the NPS protocol the seasons in southern Arizona are:
+Fall (October 1 - December 30)
+Winter (January 1 - March 30)
+Spring (April 1 - June 30)
+Monsoon (July 1 - Sept 30)
 
 ```{r}
 data_Merge2$Season1 <- as.numeric(str_sub(data_Merge2$DateAsDate,6,7))
@@ -616,7 +624,7 @@ data_Merge2$Season <- ifelse(data_Merge2$Season1 > 9 & data_Merge2$Season1 < 13,
                                     "Spring", "Monsoon")))
 ```
 
-#I would also like to include a variable to el nino or la nina years, as per a discussion with NPS regional hydrologist, Salek. 
+I would also like to include a variable to el nino or la nina years, as per a discussion with NPS regional hydrologist, Salek Shafiqullah. 
 ```{r}
 # Bring in the data
 Nin <- read.csv("Data/Raw/Nino_Nina_Raw.csv")
@@ -648,14 +656,14 @@ Nin <- na.locf(merge(NinXTS, foo=zoo(NA, order.by=seq(start(NinXTS), end(NinXTS)
 
 Nin <- data.frame(DateAsDate=index(Nin), coredata(Nin))
 ```
-#Merge this with e coli dataset
 
+Merge this with e coli dataset
 ```{r}
 data_Merge2 <- left_join(data_Merge2, 
                           Nin, by = c("DateAsDate"))
 ```
 
-#Create an attribute column for time of day. This will get at the daily temp variance since the max/min attributes are daily values rather than 15-min or hourly.
+Create an attribute column for time of day. This will get at the daily temp variance since the max/min attributes are daily values rather than 15-min or hourly as per discussion with SOAR scientist Kara Raymond.
 ```{r}
 #modified from https://stackoverflow.com/questions/49370387/convert-time-object-to-categorical-morning-afternoon-evening-night-variable
 
@@ -713,8 +721,9 @@ data_Merge3 %>%
                 color = "red", size=0.2)
 ```
 
-#I should change the categorical variables to numeric for corrplot. After changing them to text. oops. 
-#Numerical Categorical
+I should change the categorical variables back to numeric for corrplot. 
+
+Numerical Categorical swap
 ```{r}
 data_Merge3$SeasonNumeric <- ifelse(data_Merge3$Season == "Fall", 1,
           ifelse(data_Merge3$Season == "Winter", 2,
@@ -722,9 +731,9 @@ data_Merge3$SeasonNumeric <- ifelse(data_Merge3$Season == "Fall", 1,
 ```
 
 
-#I want to change the organization to numeric as well.
+I want to change the organization to numeric as well.
 
-#I'd like to look at organization to see if this has any noteworthy effect on the results. If it appears significant, this could be due to the time of testing (project funding is more likely when there is an issue) or due to the personel collecting the data. A strong correlation will indicate either of these issues.
+I'd like to look at organization to see if this has any noteworthy effect on the results. If it appears significant, this could be due to the time of testing (project funding is more likely when there is an issue) or due to the personell collecting the data. A strong correlation will indicate either of these issues.
 ```{r}
 data_Merge3$ACO_Numeric <- ifelse(data_Merge3$ActivityConductingOrganizationText == "U.S. National Park Service", 1,
    ifelse(data_Merge3$ActivityConductingOrganizationText == "NATIONAL PARK SERVICE", 1,
@@ -743,12 +752,12 @@ data_Merge3$ACO_Numeric <- ifelse(data_Merge3$ActivityConductingOrganizationText
 
 ## Begin looking at the correlation
 
-#I want to look at nulls from the climate data. I think this will have an effect on my corrplot. With removed rows, I still have ~900 to play with.
+I want to look at nulls from the climate data. I think this will have an effect on my corrplot. With removed rows, I still have ~900 to play with.
 ```{r}
 data_Merge3 <- na.omit(data_Merge3)
 ```
 
-#Create the classifiers, 126 (FBC, geometric mean, minimum of four samples in 30 days), 235 (FBC, single sample ), 575 (PBC) according to EPA regulations for the state of Arizona. 
+Create the classifiers, 126 (FBC, geometric mean, minimum of four samples in 30 days), 235 (FBC, single sample ), 575 (PBC) according to EPA regulations for the state of Arizona. 
 
 ```{r}
 data_Merge3$ecoli_235 <- ifelse(data_Merge3$StandardizedResult > 234.5,1,0)
@@ -758,7 +767,7 @@ data_Merge3$ecoli_575 <- ifelse(data_Merge3$StandardizedResult > 574.5,1,0)
 
 ## Data Exploration 2.0
 
-#Now that I've looked at the overall data, make a test and train set to proceed.
+Now that I've looked at the overall data, make a test and train set to proceed.
 ```{r}
 # De-randomize (for now, at least). 
 set.seed(24)
@@ -772,8 +781,8 @@ testdata <- data_Merge3[-subset, ]
 
 ```
 
-#Pairs examination
-#Use the *Training* data to train the models. Test data comes in for validation procedures.
+Pairs examination
+Use the *Training* data to train the models. Test data comes in for validation procedures.
 ```{r}
 # Ensure that only numeric data is contained. There was a previous cleanup but it still contained metadata.
 traindata_numeric <- traindata %>%
@@ -784,7 +793,7 @@ traindata_numeric <- traindata %>%
 pairs(traindata_numeric)
 
 ```
-#Correlation Matrix
+Correlation Matrix
 ```{r}
 # Create correlation matrix
 cor <- cor(traindata_numeric)
@@ -807,13 +816,20 @@ cor3<- cor(traindata %>%
 corrplot(cor3, method = 'square', order = 'FPC', type = 'upper', diag = FALSE, addCoef.col="black", number.cex=0.75)
 ```
 ```{r}
-# This looks at both classifications together. Repeat of previous
+# This looks at both classifications together. Repeat of previous but with limited predictors.
 cor4<- cor(traindata %>%
   select(c("ecoli_235", "ecoli_575", "Previous30Precip", "Tmin..F.", "Discharge_CFS", "Stage","NinXTS", "TOD","ACO_Numeric", "DistFromSonoita")))
 
 corrplot(cor4, method = 'square', order = 'FPC', type = 'upper', diag = FALSE, addCoef.col="black", number.cex=0.75)
 ```
 
-#It is important to ensure that I do not include correlated predictors in this model. If I choose a precipitation variable, it should only be one. Same for temperature and discharge/staff. 
+It is important to ensure that I do not include correlated predictors in this model. If I choose a precipitation variable, it should only be one. Same for temperature and discharge/staff. 
 
-#Season and temperature are also extremely strongly correlated. It may make sense to use only one variable. 
+Season and temperature are also extremely strongly correlated. It may make sense to use only one variable. 
+
+# Export data for analysis in python.
+```{r}
+write.csv(traindata, "Data/Processed/ecoli_train.csv")
+write.csv(testdata, "Data/Processed/ecoli_test.csv")
+```
+

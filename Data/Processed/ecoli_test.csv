@@ -1,0 +1,270 @@
+"","ActivityConductingOrganizationText","MonitoringLocationIdentifier","QuantificationLimit","DailyFlowCount","DateTime2","StandardizedResult","Discharge_CFS","USGS_Staff","Precipitation..in.","Tmax..F.","Tmin..F.","Previous3Precip","Previous7Precip","Previous30Precip","Season","NinXTS","TOD","Stage","DistFromSonoita","SeasonNumeric","ACO_Numeric","ecoli_235","ecoli_575"
+"8","UNIVERSITY OF ARIZONA - MARICOPA AGRICULTURAL CENTER","AZDEQ_SW-143","Value",96,2017-08-21 10:30:00,686.7,23.9,19.69,0,89,69,0,0,3.18,"Monsoon",-0.1,1,4,18000,4,6,1,1
+"12","VOLUNTEER GROUPS","AZDEQ_SW-143","Present Above Quantification Limit",94,2021-08-30 07:45:00,2419.6,86.8,20.95,0,95,69,0,0,4.91,"Monsoon",-0.5,1,4,18000,4,9,1,1
+"63","INTERNATIONAL BOUNDARY AND WATER COMMISSION","AZDEQ_SW-146","Value",96,2015-09-24 09:45:00,2419.6,26,19.87,0,85,59,2.49,3.62,5.98,"Monsoon",2.2,1,4,13200,4,5,1,1
+"67","VOLUNTEER GROUPS","AZDEQ_SW-146","Value",94,2021-11-29 09:15:00,155.3,14.1,19.99,0,78,38,0,0,0,"Fall",-1,1,2,13200,1,9,0,0
+"74","INTERNATIONAL BOUNDARY AND WATER COMMISSION","AZDEQ_SW-146","Value",96,2017-05-17 09:15:00,48.7,1.35,19.34,0,70,39,0,0,0.4,"Spring",0.3,1,1,13200,3,5,0,0
+"79","INTERNATIONAL BOUNDARY AND WATER COMMISSION","AZDEQ_SW-146","Value",96,2014-12-10 09:15:00,53,7.31,19.48,0,77,38,0,0.28,0.69,"Fall",0.7,1,2,13200,1,5,0,0
+"81","NATIONAL PARK SERVICE","AZDEQ_SW-2101","Present Above Quantification Limit",96,2010-08-12 12:00:00,2419.6,9.06,20.98,0,97,67,0,0.25,5.42,"Monsoon",-1.3,2,2,14200,4,1,1,1
+"87","NATIONAL PARK SERVICE","AZDEQ_SW-2101","Value",96,2011-02-15 12:00:00,10.4,10.1,20.35,0,80,35,0,0,0,"Winter",-1.2,2,2,14200,2,1,0,0
+"89","NATIONAL PARK SERVICE","AZDEQ_SW-2101","Present Below Quantification Limit",96,2011-08-11 12:00:00,0,1.2,20.05,0.05,88,67,0.05,1.4,4.01,"Monsoon",-0.6,2,1,14200,4,1,0,0
+"90","NATIONAL PARK SERVICE","AZDEQ_SW-2101","Value",96,2010-01-07 12:00:00,44.733,4.69,21.09,0,72,32,0,0,0.2,"Winter",1.5,2,2,14200,2,1,0,0
+"98","VOLUNTEER GROUPS","AZDEQ_SW-527","Value",90,2020-02-27 10:15:00,86.5,27.3,20.27,0,62,23,0,0.2,1.27,"Winter",0.5,1,4,13200,2,9,0,0
+"107","VOLUNTEER GROUPS","AZDEQ_SW-527","Value",92,2020-06-09 03:00:00,290.9,7.88,19.68,0,88,47,0,0,0.14,"Spring",-0.3,4,2,13200,3,9,1,0
+"109","VOLUNTEER GROUPS","AZDEQ_SW-527","Value",96,2022-03-09 02:45:00,9.8,24.8,20.09,0,61,26,0,0,0.2,"Winter",-1,4,3,13200,2,9,0,0
+"118","VOLUNTEER GROUPS","AZDEQ_SW-527","Value",96,2020-06-15 03:30:00,290.9,6.44,19.64,0,98,67,0,0,0.14,"Spring",-0.3,4,2,13200,3,9,1,0
+"119","VOLUNTEER GROUPS","AZDEQ_SW-527","Value",85,2020-02-19 03:00:00,57.3,30,20.3,0,76,38,0,0,1.55,"Winter",0.5,4,4,13200,2,9,0,0
+"123","VOLUNTEER GROUPS","AZDEQ_SW-527","Value",93,2022-02-09 02:45:00,11,20.5,20.06,0,69,29,0,0,0.02,"Winter",-0.9,4,4,13200,2,9,0,0
+"129","VOLUNTEER GROUPS","AZDEQ_SW-527","Value",96,2020-06-22 03:30:00,209.8,0.97,19.4,0,95,77,0,0,0.14,"Spring",-0.3,4,1,13200,3,9,0,0
+"139","INTERNATIONAL BOUNDARY AND WATER COMMISSION","AZDEQ_SW-965","Value",93,2017-12-13 08:30:00,88,14.4,19.58,0,70,37,0,0,0,"Fall",-1,1,2,1700,1,5,0,0
+"142","FRIENDS OF THE SANTA CRUZ RIVER","AZDEQ_SW-965","Value",96,2010-08-25 08:30:00,2400,93.3,21.75,0.42,98,67,0.42,0.42,5.09,"Monsoon",-1.3,1,4,1700,4,2,1,1
+"144","FRIENDS OF THE SANTA CRUZ RIVER","AZDEQ_SW-965","Value",95,2009-10-27 09:00:00,58,5.58,20.99,0,79,38,0,0,0.16,"Fall",1,1,2,1700,1,2,0,0
+"153","VOLUNTEER GROUPS","AZDEQ_SW-965","Value",96,2022-07-25 08:00:00,435.2,13.8,19.77,0.92,88,66,0.98,1.34,3.07,"Monsoon",-0.8,1,2,1700,4,9,1,0
+"154","VOLUNTEER GROUPS","AZDEQ_SW-965","Value",91,2022-01-31 09:30:00,21.3,15.9,20.01,0,69,33,0,0,0.02,"Winter",-1,1,4,1700,2,9,0,0
+"162","VOLUNTEER GROUPS","AZDEQ_SW-965","Present Above Quantification Limit",94,2021-08-30 09:00:00,2419.6,75.9,20.86,0,95,69,0,0,4.91,"Monsoon",-0.5,1,4,1700,4,9,1,1
+"171","FRIENDS OF THE SANTA CRUZ RIVER","AZDEQ_SW-966","Value",96,2010-04-29 07:30:00,110,13.8,21.19,0,84,58,0,0.7,0.74,"Spring",0.4,1,2,22000,3,2,0,0
+"172","VOLUNTEER GROUPS","AZDEQ_SW-966","Value",94,2019-01-28 08:15:00,1119.1,23.9,19.77,0,73,29,0,0,0.73,"Winter",0.7,1,3,22000,2,9,1,1
+"174","VOLUNTEER GROUPS","AZDEQ_SW-966","Value",91,2022-01-31 08:00:00,57.1,16.8,20.02,0,69,33,0,0,0.02,"Winter",-1,1,4,22000,2,9,0,0
+"178","VOLUNTEER GROUPS","AZDEQ_SW-966","Present Above Quantification Limit",94,2021-08-30 06:30:00,2419.6,99.5,21.05,0,95,69,0,0,4.91,"Monsoon",-0.5,1,4,22000,4,9,1,1
+"190","NPS","SODN_Index_Point","Present Above Quantification Limit",96,2011-08-11 12:15:00,2419.6,0.93,20.02,0.05,88,67,0.05,1.4,4.01,"Monsoon",-0.6,2,1,13200,4,8,1,1
+"197","NPS","SODN_Index_Point","Value",96,2013-05-22 10:00:00,303.7,0,19.32,0,92,50,0,0,0,"Spring",-0.4,1,1,13200,3,8,1,0
+"202","NPS","SODN_Index_Point","Value",96,2014-11-17 12:30:00,17.7,3.48,19.31,0,65,14,0,0,0.15,"Fall",0.6,2,2,13200,1,8,0,0
+"210","NPS","SODN_Index_Point","Value",94,2017-05-16 10:15:00,104.9,1.35,19.34,0,86,54,0,0.4,0.4,"Spring",0.3,1,1,13200,3,8,0,0
+"215","NPS","SODN_Index_Point","Value",96,2018-11-15 10:30:00,39.2,20.9,19.62,0,62,29,0,0,1.49,"Fall",0.9,1,4,13200,1,8,0,0
+"222","NPS","SODN_Index_Point","Value",85,2020-11-16 10:15:00,283.3,3.06,19.65,0,87,38,0,0.16,0.21,"Fall",-1.3,1,2,13200,1,8,1,0
+"224","NPS","SODN_Index_Point","Value",93,2021-05-17 09:45:00,86.3,0.5,19.51,0,85,42,0,0,0,"Spring",-0.5,1,1,13200,3,8,0,0
+"225","NPS","SODN_Index_Point","Value",94,2021-08-30 10:45:00,2419.6,62.3,20.74,0,95,69,0,0,4.91,"Monsoon",-0.5,1,4,13200,4,8,1,1
+"226","NPS","SODN_Index_Point","Value",96,2021-11-16 10:45:00,59.9,8.22,19.96,0,84,39,0,0,0,"Fall",-1,1,2,13200,1,8,0,0
+"227","NPS","SODN_Index_Point","Value",95,2022-02-14 10:30:00,18.3,18.7,20.03,0,79,36,0,0,0.02,"Winter",-0.9,1,4,13200,2,8,0,0
+"229","Friends of the Santa Cruz River, Tubac, AZ","USGS-09481710","Value",96,2014-08-27 09:00:00,1100,11.2,19.7,0,81,63,0.43,0.43,3.48,"Monsoon",0.1,1,2,1700,4,2,1,1
+"231","Friends of the Santa Cruz River, Tubac, AZ","USGS-09481710","Value",96,2013-01-31 09:15:00,360,5.47,19.66,0,54,14,0.22,0.53,0.56,"Winter",-0.4,1,2,1700,2,2,1,0
+"233","Friends of the Santa Cruz River, Tubac, AZ","USGS-09481710","Value",96,2014-11-24 09:15:00,1300,5.72,19.42,0,66,9,0.41,0.41,0.41,"Fall",0.6,1,2,1700,1,2,1,1
+"234","Friends of the Santa Cruz River, Tubac, AZ","USGS-09481710","Value",96,2011-05-25 08:45:00,62,2.27,20.11,0,92,46,0,0,0,"Spring",-0.6,1,2,1700,3,2,0,0
+"236","Friends of the Santa Cruz River, Tubac, AZ","USGS-09481710","Value",96,2010-01-26 09:30:00,300,13.8,21.07,0,58,32,0,3.79,3.79,"Winter",1.5,1,2,1700,2,2,1,0
+"237","Friends of the Santa Cruz River, Tubac, AZ","USGS-09481710","Value",96,2014-03-26 08:30:00,80,1.22,19.35,0,80,38,0,0,1.77,"Winter",-0.3,1,1,1700,2,2,0,0
+"240","Friends of the Santa Cruz River, Tubac, AZ","USGS-09481710","Value",96,2012-03-28 08:45:00,52,7.66,19.87,0,83,40,0,0,0.55,"Winter",-0.6,1,2,1700,2,2,0,0
+"241","Friends of the Santa Cruz River, Tubac, AZ","USGS-09481710","Value",95,2009-10-27 09:00:00,62,5.58,20.99,0,79,38,0,0,0.16,"Fall",1,1,2,1700,1,2,0,0
+"242","Friends of the Santa Cruz River, Tubac, AZ","USGS-09481710","Value",96,2013-03-27 09:15:00,13,4.79,19.63,0,83,46,0,0,0.42,"Winter",-0.3,1,2,1700,2,2,0,0
+"251","Friends of the Santa Cruz River, Tubac, AZ","USGS-09481710","Value",95,2011-08-31 08:00:00,440,2.88,19.79,0,101,72,0,0,2.15,"Monsoon",-0.6,1,2,1700,4,2,1,0
+"253","Friends of the Santa Cruz River, Tubac, AZ","USGS-09481710","Present Above Quantification Limit",96,2013-08-29 08:45:00,2419.6,3.13,19.42,1.21,90,67,1.21,1.62,2.93,"Monsoon",-0.3,1,2,1700,4,2,1,1
+"255","Friends of the Santa Cruz River, Tubac, AZ","USGS-09481710","Value",96,2014-04-30 08:15:00,64,0.42,19.32,0,72,21,0,0,0,"Spring",0,1,1,1700,3,2,0,0
+"258","U.S. Geological Survey-Water Resources Discipline","USGS-09481710","Present Above Quantification Limit",96,2015-09-21 16:30:00,2419.6,755,23.24,0.31,86,63,1.13,1.13,4.22,"Monsoon",2.2,3,3,1700,4,3,1,1
+"261","Friends of the Santa Cruz River, Tubac, AZ","USGS-09481710","Present Above Quantification Limit",96,2014-09-23 09:00:00,2419.6,22,20,0,91,62,0.02,2.1,3.54,"Monsoon",0.2,1,4,1700,4,2,1,1
+"265","Friends of the Santa Cruz River, Tubac, AZ","USGS-09481710","Present Above Quantification Limit",96,2010-07-28 08:15:00,2419.6,36.2,21.41,0.74,85,68,0.81,0.97,3.23,"Monsoon",-1,1,4,1700,4,2,1,1
+"266","U.S. National Park Service","USGS-09481710","Value",96,2012-07-25 08:30:00,2000,15.6,19.99,0,93,69,0.05,0.74,2.21,"Monsoon",0.2,1,4,1700,4,1,1,1
+"268","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-07-24 21:30:00,2419.6,54.7,20.24,0.12,85,66,0.12,1.27,4.91,"Monsoon",1.5,4,3,18000,4,3,1,1
+"272","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-09-22 04:15:00,2419.6,979,23.64,2.48,70,63,3.61,3.61,6.4,"Monsoon",2.2,4,4,18000,4,3,1,1
+"277","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-09-22 18:00:00,2419.6,245,21.53,2.48,70,63,3.61,3.61,6.4,"Monsoon",2.2,3,4,18000,4,3,1,1
+"279","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-08-21 00:15:00,2419.6,666,23.03,0.05,94,66,0.05,0.14,3.62,"Monsoon",1.9,4,3,18000,4,3,1,1
+"287","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Value",96,2016-02-08 15:45:00,44,10.7,19.61,0,72,33,0,0,0.42,"Winter",2.1,2,2,18000,2,3,0,0
+"296","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-08-21 00:00:00,2419.6,623,22.92,0.05,94,66,0.05,0.14,3.62,"Monsoon",1.9,4,3,18000,4,3,1,1
+"298","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-08-21 00:30:00,2419.6,687,23.08,0.05,94,66,0.05,0.14,3.62,"Monsoon",1.9,4,3,18000,4,3,1,1
+"300","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-08-21 03:00:00,2419.6,170,21.13,0.05,94,66,0.05,0.14,3.62,"Monsoon",1.9,4,4,18000,4,3,1,1
+"301","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-09-22 00:15:00,2419.6,1250,24.03,2.48,70,63,3.61,3.61,6.4,"Monsoon",2.2,4,3,18000,4,3,1,1
+"312","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-09-21 13:45:00,2419.6,179,21.18,0.31,86,63,1.13,1.13,4.22,"Monsoon",2.2,2,3,18000,4,3,1,1
+"313","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-09-21 17:45:00,2419.6,884,23.48,0.31,86,63,1.13,1.13,4.22,"Monsoon",2.2,3,4,18000,4,3,1,1
+"314","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-08-21 02:00:00,2419.6,414,22.25,0.05,94,66,0.05,0.14,3.62,"Monsoon",1.9,4,4,18000,4,3,1,1
+"316","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-09-23 08:00:00,2419.6,69.5,20.39,0.01,83,59,2.8,3.62,6.08,"Monsoon",2.2,1,4,18000,4,3,1,1
+"318","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-07-24 22:45:00,2419.6,106,20.7,0.12,85,66,0.12,1.27,4.91,"Monsoon",1.5,4,3,18000,4,3,1,1
+"320","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-07-29 00:45:00,2419.6,285,21.72,1.17,97,66,1.17,1.29,5.73,"Monsoon",1.5,4,3,18000,4,3,1,1
+"321","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",94,2015-08-20 23:30:00,2419.6,549,22.71,0,96,71,0,0.09,3.57,"Monsoon",1.9,4,3,18000,4,3,1,1
+"327","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2016-07-20 12:30:00,2419.6,0.53,19.23,0,97,68,0.45,0.64,2.46,"Monsoon",-0.4,2,1,18000,4,3,1,1
+"330","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-07-01 16:30:00,2419.6,0.71,19.13,0.88,92,54,1.56,1.67,2.17,"Monsoon",1.5,3,1,18000,4,3,1,1
+"333","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-09-21 18:30:00,2419.6,1010,23.69,0.31,86,63,1.13,1.13,4.22,"Monsoon",2.2,3,3,18000,4,3,1,1
+"341","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-09-22 03:15:00,2419.6,1150,23.9,2.48,70,63,3.61,3.61,6.4,"Monsoon",2.2,4,4,18000,4,3,1,1
+"342","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Value",95,2016-12-08 13:15:00,91,9.84,19.6,0,65,34,0,0,0.14,"Fall",-0.6,2,2,18000,1,3,0,0
+"344","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-09-21 14:45:00,2419.6,456,22.4,0.31,86,63,1.13,1.13,4.22,"Monsoon",2.2,2,3,18000,4,3,1,1
+"347","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2016-01-05 10:00:00,2419.6,33.3,19.98,1,58,40,1,1,1.29,"Winter",2.5,1,4,18000,2,3,1,1
+"348","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-09-21 14:00:00,2419.6,225,21.43,0.31,86,63,1.13,1.13,4.22,"Monsoon",2.2,2,3,18000,4,3,1,1
+"349","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-09-21 22:15:00,2419.6,1240,24.02,0.31,86,63,1.13,1.13,4.22,"Monsoon",2.2,4,3,18000,4,3,1,1
+"351","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Value",96,2015-07-27 16:30:00,1000,0.48,19.16,0,91,71,0,0.12,4.8,"Monsoon",1.5,3,1,18000,4,3,1,1
+"356","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Value",96,2016-03-02 14:00:00,44,8.32,19.57,0,81,39,0,0,0,"Winter",1.6,2,2,18000,2,3,0,0
+"358","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-09-21 12:15:00,2419.6,51,20.2,0.31,86,63,1.13,1.13,4.22,"Monsoon",2.2,2,3,18000,4,3,1,1
+"360","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Value",95,2016-12-08 11:15:00,110,12,19.63,0,65,34,0,0,0.14,"Fall",-0.6,2,2,18000,1,3,0,0
+"362","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-09-21 13:15:00,2419.6,107,20.71,0.31,86,63,1.13,1.13,4.22,"Monsoon",2.2,2,3,18000,4,3,1,1
+"365","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-07-28 23:30:00,2419.6,94.7,20.61,0,95,71,0,0.12,4.8,"Monsoon",1.5,4,3,18000,4,3,1,1
+"369","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-09-21 20:15:00,2419.6,1230,24.01,0.31,86,63,1.13,1.13,4.22,"Monsoon",2.2,4,3,18000,4,3,1,1
+"373","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Value",96,2015-06-09 16:00:00,110,0.44,19.08,0.5,94,65,0.5,0.5,0.55,"Spring",1.2,2,1,18000,3,3,0,0
+"374","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-07-25 03:30:00,2419.6,33.3,19.98,0,88,69,0.12,1.27,4.91,"Monsoon",1.5,4,4,18000,4,3,1,1
+"376","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Value",96,2016-03-02 02:00:00,170,13.6,19.68,0,81,39,0,0,0,"Winter",1.6,4,2,18000,2,3,0,0
+"378","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Value",95,2016-12-08 12:15:00,68,11.2,19.62,0,65,34,0,0,0.14,"Fall",-0.6,2,2,18000,1,3,0,0
+"380","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Value",96,2016-02-09 16:15:00,31,10.3,19.6,0,79,37,0,0,0.42,"Winter",2.1,3,2,18000,2,3,0,0
+"389","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-09-22 19:00:00,2419.6,215,21.38,2.48,70,63,3.61,3.61,6.4,"Monsoon",2.2,3,4,18000,4,3,1,1
+"390","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Value",95,2016-12-08 01:15:00,260,13.6,19.65,0,65,34,0,0,0.14,"Fall",-0.6,4,2,18000,1,3,1,0
+"391","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-07-29 00:15:00,2419.6,211,21.36,1.17,97,66,1.17,1.29,5.73,"Monsoon",1.5,4,3,18000,4,3,1,1
+"394","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",94,2015-08-20 21:00:00,2419.6,79.3,20.48,0,96,71,0,0.09,3.57,"Monsoon",1.9,4,3,18000,4,3,1,1
+"398","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Value",95,2016-12-08 08:15:00,100,11.2,19.62,0,65,34,0,0,0.14,"Fall",-0.6,1,2,18000,1,3,0,0
+"399","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-09-22 16:00:00,2419.6,328,21.91,2.48,70,63,3.61,3.61,6.4,"Monsoon",2.2,2,4,18000,4,3,1,1
+"409","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-09-23 01:00:00,2419.6,120,20.8,0.01,83,59,2.8,3.62,6.08,"Monsoon",2.2,4,4,18000,4,3,1,1
+"410","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2016-07-21 03:30:00,2419.6,124,20.83,0,103,71,0,0.64,2.46,"Monsoon",-0.4,4,3,18000,4,3,1,1
+"413","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-09-22 22:00:00,2419.6,154,21.03,2.48,70,63,3.61,3.61,6.4,"Monsoon",2.2,4,4,18000,4,3,1,1
+"415","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-09-22 11:15:00,2419.6,765,23.26,2.48,70,63,3.61,3.61,6.4,"Monsoon",2.2,2,4,18000,4,3,1,1
+"418","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-09-21 21:15:00,2419.6,1230,24.01,0.31,86,63,1.13,1.13,4.22,"Monsoon",2.2,4,4,18000,4,3,1,1
+"423","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-07-13 14:45:00,2419.6,4.43,19.45,0.7,97,66,0.7,0.94,3.26,"Monsoon",1.5,2,2,18000,4,3,1,1
+"432","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-07-01 23:00:00,2419.6,27.2,19.89,0.88,92,54,1.56,1.67,2.17,"Monsoon",1.5,4,4,18000,4,3,1,1
+"437","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Value",95,2016-12-08 00:15:00,230,13.6,19.65,0,65,34,0,0,0.14,"Fall",-0.6,4,2,18000,1,3,0,0
+"441","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2016-07-07 12:30:00,2419.6,1.41,19.33,0,94,70,0,1.04,1.84,"Monsoon",-0.4,2,1,18000,4,3,1,1
+"449","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-07-29 03:30:00,2419.6,153,21.02,1.17,97,66,1.17,1.29,5.73,"Monsoon",1.5,4,4,18000,4,3,1,1
+"450","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-09-22 12:15:00,2419.6,620,22.91,2.48,70,63,3.61,3.61,6.4,"Monsoon",2.2,2,4,18000,4,3,1,1
+"462","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-07-28 23:45:00,2419.6,124,20.83,0,95,71,0,0.12,4.8,"Monsoon",1.5,4,3,18000,4,3,1,1
+"463","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-09-21 20:45:00,2419.6,1240,24.02,0.31,86,63,1.13,1.13,4.22,"Monsoon",2.2,4,4,18000,4,3,1,1
+"465","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2016-07-20 00:45:00,2419.6,54.7,20.24,0,97,68,0.45,0.64,2.46,"Monsoon",-0.4,4,4,18000,4,3,1,1
+"471","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2016-01-05 02:00:00,2419.6,298,21.78,1,58,40,1,1,1.29,"Winter",2.5,4,4,18000,2,3,1,1
+"481","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Value",96,2016-03-01 20:00:00,79,12.1,19.65,0,80,38,0,0,0.42,"Winter",1.6,4,2,18000,2,3,0,0
+"496","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Value",96,2015-09-18 12:00:00,230,2.8,19.39,0,91,60,0,0.4,3.14,"Monsoon",2.2,2,2,18000,4,3,0,0
+"497","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Value",96,2016-01-04 16:00:00,75,13.6,19.66,0,71,47,0,0,0.29,"Winter",2.5,2,2,18000,2,3,0,0
+"501","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-07-24 22:30:00,2419.6,101,20.66,0.12,85,66,0.12,1.27,4.91,"Monsoon",1.5,4,3,18000,4,3,1,1
+"506","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-07-28 23:45:00,2419.6,124,20.83,0,95,71,0,0.12,4.8,"Monsoon",1.5,4,3,18000,4,3,1,1
+"509","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2016-07-21 04:30:00,2419.6,91,20.58,0,103,71,0,0.64,2.46,"Monsoon",-0.4,4,4,18000,4,3,1,1
+"513","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-09-21 19:45:00,2419.6,1200,23.97,0.31,86,63,1.13,1.13,4.22,"Monsoon",2.2,4,3,18000,4,3,1,1
+"517","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2016-07-21 04:00:00,2419.6,114,20.76,0,103,71,0,0.64,2.46,"Monsoon",-0.4,4,4,18000,4,3,1,1
+"526","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-07-24 22:00:00,2419.6,82.7,20.51,0.12,85,66,0.12,1.27,4.91,"Monsoon",1.5,4,3,18000,4,3,1,1
+"533","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-09-22 07:15:00,2419.6,1010,23.69,2.48,70,63,3.61,3.61,6.4,"Monsoon",2.2,1,3,18000,4,3,1,1
+"534","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Value",95,2016-12-08 03:15:00,460,13.6,19.65,0,65,34,0,0,0.14,"Fall",-0.6,4,2,18000,1,3,1,0
+"537","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Value",96,2016-03-03 12:15:00,56,9.88,19.61,0,86,39,0,0,0,"Winter",1.6,2,2,18000,2,3,0,0
+"539","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-09-21 23:15:00,2419.6,1230,24.01,0.31,86,63,1.13,1.13,4.22,"Monsoon",2.2,4,4,18000,4,3,1,1
+"542","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-07-29 05:30:00,2419.6,74.9,20.44,1.17,97,66,1.17,1.29,5.73,"Monsoon",1.5,1,4,18000,4,3,1,1
+"543","U.S. Geological Survey-Water Resources Discipline","USGS-09481740","Present Above Quantification Limit",96,2015-07-24 23:15:00,2419.6,102,20.67,0.12,85,66,0.12,1.27,4.91,"Monsoon",1.5,4,4,18000,4,3,1,1
+"555","Friends of the Santa Cruz River, Tubac, AZ","USGS-312809110592801","Value",94,2015-10-29 09:30:00,120,15.5,19.7,0.11,81,52,0.11,0.11,1.78,"Fall",2.4,1,4,1700,1,2,0,0
+"556","Friends of the Santa Cruz River, Tubac, AZ","USGS-312809110592801","Value",95,2016-11-28 09:15:00,93,9.21,19.59,0.09,60,30,0.09,0.09,0.09,"Fall",-0.7,1,2,1700,1,2,0,0
+"574","U.S. Geological Survey-Water Resources Discipline","USGS-313148111011101","Value",93,2016-12-07 16:15:00,440,7.02,19.55,0,66,46,0,0,0.14,"Fall",-0.6,3,2,8900,1,3,1,0
+"580","U.S. Geological Survey-Water Resources Discipline","USGS-313148111011101","Present Above Quantification Limit",96,2016-07-19 20:00:00,2419.6,0.38,19.2,0,92,70,0.64,0.64,2.46,"Monsoon",-0.4,4,1,8900,4,3,1,1
+"587","U.S. Geological Survey-Water Resources Discipline","USGS-313148111011101","Value",96,2016-03-01 14:30:00,280,8.32,19.57,0,80,38,0,0,0.42,"Winter",1.6,2,2,8900,2,3,1,0
+"589","U.S. Geological Survey-Water Resources Discipline","USGS-313148111011101","Present Above Quantification Limit",96,2015-06-09 11:30:00,2419.6,0.61,19.12,0.5,94,65,0.5,0.5,0.55,"Spring",1.2,2,1,8900,3,3,1,1
+"590","U.S. Geological Survey-Water Resources Discipline","USGS-313148111011101","Present Above Quantification Limit",96,2015-06-09 12:15:00,2419.6,0.52,19.1,0.5,94,65,0.5,0.5,0.55,"Spring",1.2,2,1,8900,3,3,1,1
+"595","U.S. Geological Survey-Water Resources Discipline","USGS-313307111020201","Present Above Quantification Limit",96,2015-09-22 12:00:00,2419.6,639,22.96,2.48,70,63,3.61,3.61,6.4,"Monsoon",2.2,2,4,119000,4,3,1,1
+"603","Friends of the Santa Cruz River, Tubac, AZ","USGS-313343110024701","Value",96,2015-01-29 09:00:00,14,11,19.58,0,73,34,0.1,0.1,0.49,"Winter",0.5,1,2,13200,2,2,0,0
+"607","U.S. National Park Service","USGS-313343110024701","Value",96,2010-10-26 11:15:00,610,14.3,20.44,0,79,45,0,0.04,1.58,"Fall",-1.6,2,2,13200,1,1,1,1
+"609","Friends of the Santa Cruz River, Tubac, AZ","USGS-313343110024701","Value",96,2011-01-26 09:00:00,24,15.7,20.48,0,67,24,0,0,0.59,"Winter",-1.4,1,4,13200,2,2,0,0
+"613","U.S. National Park Service","USGS-313343110024701","Value",96,2010-12-02 13:15:00,16,10.9,20.37,0,74,32,0,0,0,"Fall",-1.6,2,2,13200,1,1,0,0
+"622","U.S. National Park Service","USGS-313343110024701","Value",96,2009-07-06 08:45:00,1700,9.7,21.14,0,97,72,0.3,2.8,3,"Monsoon",0.5,1,2,13200,4,1,1,1
+"624","U.S. National Park Service","USGS-313343110024701","Value",96,2014-11-20 14:00:00,7,3.31,19.3,0,71,29,0,0,0,"Fall",0.6,2,2,13200,1,1,0,0
+"627","U.S. National Park Service","USGS-313343110024701","Value",96,2010-12-20 10:15:00,38,13.4,20.42,0,74,41,0,0.07,0.07,"Fall",-1.6,1,2,13200,1,1,0,0
+"631","U.S. National Park Service","USGS-313343110024701","Value",96,2012-03-14 16:15:00,650,3.85,19.74,0,81,34,0,0,0.37,"Winter",-0.6,3,2,13200,2,1,1,1
+"636","Friends of the Santa Cruz River, Tubac, AZ","USGS-313343110024701","Value",95,2009-10-27 08:15:00,120,5.58,20.99,0,79,38,0,0,0.16,"Fall",1,1,2,13200,1,2,0,0
+"637","U.S. National Park Service","USGS-313343110024701","Present Above Quantification Limit",96,2010-01-20 09:45:00,2419.6,7.45,21.19,0.67,63,39,0.67,0.67,0.87,"Winter",1.5,1,2,13200,2,1,1,1
+"638","U.S. National Park Service","USGS-313343110024701","Present Above Quantification Limit",96,2009-09-08 08:15:00,2419.6,10.9,21.13,0,89,61,0.31,1.13,3.46,"Monsoon",0.7,1,2,13200,4,1,1,1
+"641","U.S. National Park Service","USGS-313343110024701","Value",96,2013-07-31 09:15:00,100,1.58,19.32,0,96,66,0,0.78,4.18,"Monsoon",-0.4,1,1,13200,4,1,0,0
+"642","U.S. National Park Service","USGS-313343110024701","Value",96,2014-10-06 10:00:00,160,5.85,19.47,0,87,53,0,0,2.39,"Fall",0.5,1,2,13200,1,1,0,0
+"643","Friends of the Santa Cruz River, Tubac, AZ","USGS-313343110024701","Value",96,2009-07-28 07:30:00,380,8.33,21.1,0,103,68,0.01,0.49,4.9,"Monsoon",0.5,1,2,13200,4,2,1,0
+"645","U.S. National Park Service","USGS-313343110024701","Value",95,2017-02-22 15:15:00,200,9.21,19.59,0,75,39,0.25,0.25,0.42,"Winter",-0.2,2,2,13200,2,1,0,0
+"649","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Present Above Quantification Limit",96,2016-08-01 10:00:00,2419.6,42.5,20.1,1.18,89,66,1.56,2.26,2.9,"Monsoon",-0.5,1,4,13200,4,3,1,1
+"651","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Present Above Quantification Limit",96,2016-01-05 02:00:00,2419.6,298,21.78,1,58,40,1,1,1.29,"Winter",2.5,4,4,13200,2,3,1,1
+"657","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Value",95,2016-12-08 05:00:00,93,12,19.63,0,65,34,0,0,0.14,"Fall",-0.6,1,2,13200,1,3,0,0
+"663","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Value",96,2015-03-11 17:00:00,75,6.48,19.45,0,76,40,0,0,1,"Winter",0.5,3,2,13200,2,3,0,0
+"665","U.S. National Park Service","USGS-313343110024701","Present Above Quantification Limit",95,2011-12-14 16:00:00,2419.6,48.8,20.68,1.33,47,33,2.29,2.29,2.51,"Fall",-1,3,4,13200,1,1,1,1
+"666","Friends of the Santa Cruz River, Tubac, AZ","USGS-313343110024701","Value",96,2011-03-30 08:00:00,54,11.3,20.36,0,81,42,0,0,0.04,"Winter",-0.9,1,2,13200,2,2,0,0
+"672","U.S. National Park Service","USGS-313343110024701","Value",96,2011-07-27 11:00:00,520,0.78,20,0,84,63,0.03,0.52,2.96,"Monsoon",-0.5,1,1,13200,4,1,1,0
+"676","U.S. National Park Service","USGS-313343110024701","Present Above Quantification Limit",96,2012-07-16 14:15:00,2419.6,12.9,20,0.03,93,68,0.03,0.39,1.86,"Monsoon",0.2,2,2,13200,4,1,1,1
+"677","U.S. National Park Service","USGS-313343110024701","Value",96,2015-11-12 16:00:00,51,10.3,19.59,0,70,25,0,0,1.96,"Fall",2.6,2,2,13200,1,1,0,0
+"678","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Value",96,2015-03-03 12:00:00,43,11.4,19.59,0.22,63,37,0.22,0.22,1,"Winter",0.5,2,2,13200,2,3,0,0
+"681","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Present Above Quantification Limit",96,2015-06-09 14:30:00,2419.6,0.44,19.08,0.5,94,65,0.5,0.5,0.55,"Spring",1.2,2,1,13200,3,3,1,1
+"683","Friends of the Santa Cruz River, Tubac, AZ","USGS-313343110024701","Present Above Quantification Limit",96,2010-07-28 07:45:00,2419.6,41.3,21.46,0.74,85,68,0.81,0.97,3.23,"Monsoon",-1,1,4,13200,4,2,1,1
+"685","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Value",96,2015-03-03 08:00:00,140,13.9,19.64,0.22,63,37,0.22,0.22,1,"Winter",0.5,1,2,13200,2,3,0,0
+"687","U.S. National Park Service","USGS-313343110024701","Value",96,2010-09-29 14:00:00,200,3.54,20.29,0,90,56,0,0,1.2,"Monsoon",-1.6,2,2,13200,4,1,0,0
+"689","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Value",93,2016-12-07 21:00:00,370,9.84,19.6,0,66,46,0,0,0.14,"Fall",-0.6,4,2,13200,1,3,1,0
+"690","U.S. National Park Service","USGS-313343110024701","Value",96,2016-01-13 15:45:00,440,13.6,19.66,0,61,24,0,0.65,1.75,"Winter",2.5,2,2,13200,2,1,1,0
+"692","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Value",96,2015-02-02 14:15:00,2300,14.8,19.66,0,60,37,1.09,1.76,2.06,"Winter",0.5,2,4,13200,2,3,1,1
+"697","Friends of the Santa Cruz River, Tubac, AZ","USGS-313343110024701","Value",96,2013-02-19 15:15:00,26,3.51,19.57,0,67,26,0,0,0.83,"Winter",-0.4,2,2,13200,2,2,0,0
+"704","Friends of the Santa Cruz River, Tubac, AZ","USGS-313343110024701","Value",96,2013-04-24 08:00:00,340,1.58,19.5,0,86,46,0,0,0,"Spring",-0.3,1,1,13200,3,2,1,0
+"705","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Value",96,2015-03-11 15:00:00,14,7.02,19.47,0,76,40,0,0,1,"Winter",0.5,2,2,13200,2,3,0,0
+"707","U.S. National Park Service","USGS-313343110024701","Value",96,2011-11-01 09:15:00,74,0.93,19.61,0,86,43,0,0,0,"Fall",-1.1,1,1,13200,1,1,0,0
+"708","U.S. National Park Service","USGS-313343110024701","Value",96,2011-02-10 15:00:00,13,7.16,20.28,0,63,26,0,0,0,"Winter",-1.2,2,2,13200,2,1,0,0
+"711","U.S. National Park Service","USGS-313343110024701","Value",96,2010-04-21 10:45:00,33,8.72,21.05,0,80,59,0,0,0.04,"Spring",0.4,1,2,13200,3,1,0,0
+"715","U.S. National Park Service","USGS-313343110024701","Value",93,2017-03-01 15:00:00,9,8.61,19.58,0,64,30,0,0,0.25,"Winter",0.1,2,2,13200,2,1,0,0
+"717","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Value",95,2016-12-08 07:00:00,80,11.2,19.62,0,65,34,0,0,0.14,"Fall",-0.6,1,2,13200,1,3,0,0
+"718","U.S. National Park Service","USGS-313343110024701","Value",96,2010-11-18 14:30:00,32,7.76,20.31,0,72,35,0,0,0.04,"Fall",-1.6,2,2,13200,1,1,0,0
+"721","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Present Above Quantification Limit",96,2015-07-28 21:15:00,2419.6,0.65,19.19,0,95,71,0,0.12,4.8,"Monsoon",1.5,4,1,13200,4,3,1,1
+"722","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Value",96,2015-04-03 10:30:00,2,5.03,19.37,0,82,42,0.33,0.33,0.33,"Spring",0.7,1,2,13200,3,3,0,0
+"723","Friends of the Santa Cruz River, Tubac, AZ","USGS-313343110024701","Value",96,2011-04-27 08:30:00,32,7.16,20.27,0,84,44,0,0,0.13,"Spring",-0.7,1,2,13200,3,2,0,0
+"725","Friends of the Santa Cruz River, Tubac, AZ","USGS-313343110024701","Value",96,2014-02-26 08:30:00,12,1.58,19.45,0,70,42,0,0,0.25,"Winter",-0.5,1,1,13200,2,2,0,0
+"726","U.S. National Park Service","USGS-313343110024701","Value",96,2011-09-20 08:30:00,580,3.37,19.83,0,94,56,0,0.15,2.7,"Monsoon",-0.8,1,2,13200,4,1,1,1
+"727","Friends of the Santa Cruz River, Tubac, AZ","USGS-313343110024701","Value",96,2010-01-26 08:45:00,580,14.7,21.09,0,58,32,0,3.79,3.79,"Winter",1.5,1,4,13200,2,2,1,1
+"732","U.S. National Park Service","USGS-313343110024701","Value",94,2016-10-19 16:30:00,330,1.35,19.34,0,88,45,0,0,0.05,"Fall",-0.7,3,1,13200,1,1,1,0
+"736","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Present Above Quantification Limit",96,2016-01-05 10:00:00,2419.6,33.3,19.98,1,58,40,1,1,1.29,"Winter",2.5,1,4,13200,2,3,1,1
+"751","U.S. National Park Service","USGS-313343110024701","Present Above Quantification Limit",96,2014-08-20 10:45:00,2419.6,21.6,19.99,0,87,65,0.12,0.85,4.3,"Monsoon",0.1,1,4,13200,4,1,1,1
+"755","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Value",93,2016-12-07 15:00:00,46,8.05,19.57,0,66,46,0,0,0.14,"Fall",-0.6,2,2,13200,1,3,0,0
+"758","U.S. National Park Service","USGS-313343110024701","Value",96,2012-10-09 10:00:00,370,0.49,19.28,0,89,49,0,0,0.29,"Fall",0.3,1,1,13200,1,1,1,0
+"759","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Present Above Quantification Limit",96,2015-02-01 13:30:00,2419.6,27.8,19.87,0.12,56,40,1.66,1.76,2.06,"Winter",0.5,2,4,13200,2,3,1,1
+"760","Friends of the Santa Cruz River, Tubac, AZ","USGS-313343110024701","Value",96,2014-07-30 08:00:00,2400,0.93,19.03,0,96,68,0.05,1.25,5.01,"Monsoon",0,1,1,13200,4,2,1,1
+"769","Friends of the Santa Cruz River, Tubac, AZ","USGS-313343110024701","Value",94,2015-10-29 08:45:00,130,15.5,19.7,0.11,81,52,0.11,0.11,1.78,"Fall",2.4,1,4,13200,1,2,0,0
+"770","U.S. National Park Service","USGS-313343110024701","Present Above Quantification Limit",96,2013-01-29 09:45:00,2419.6,6.93,19.72,0.22,57,31,0.32,0.53,0.69,"Winter",-0.4,1,2,13200,2,1,1,1
+"772","U.S. National Park Service","USGS-313343110024701","Value",96,2016-02-24 16:30:00,33,8.32,19.56,0,68,31,0,0,0.42,"Winter",2.1,3,2,13200,2,1,0,0
+"774","U.S. National Park Service","USGS-313343110024701","Value",96,2016-03-16 16:15:00,21,7.61,19.56,0,80,39,0,0,0.5,"Winter",1.6,3,2,13200,2,1,0,0
+"776","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Present Above Quantification Limit",96,2015-01-30 13:00:00,2419.6,116,20.76,0.57,69,52,0.57,0.67,1.06,"Winter",0.5,2,3,13200,2,3,1,1
+"777","Friends of the Santa Cruz River, Tubac, AZ","USGS-313343110024701","Present Above Quantification Limit",96,2014-09-23 08:15:00,2419.6,22.9,20.02,0,91,62,0.02,2.1,3.54,"Monsoon",0.2,1,4,13200,4,2,1,1
+"778","U.S. National Park Service","USGS-313343110024701","Value",96,2010-01-04 09:15:00,6,5.82,21.13,0,70,33,0,0,0.23,"Winter",1.5,1,2,13200,2,1,0,0
+"787","Friends of the Santa Cruz River, Tubac, AZ","USGS-313343110024701","Value",96,2011-07-27 07:45:00,630,1.61,20.09,0,84,63,0.03,0.52,2.96,"Monsoon",-0.5,1,1,13200,4,2,1,1
+"795","U.S. National Park Service","USGS-313343110024701","Present Above Quantification Limit",96,2012-09-05 07:15:00,2419.6,56,20.8,0,84,67,0.67,1.31,2.49,"Monsoon",0.4,1,4,13200,4,1,1,1
+"801","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Value",96,2015-11-19 16:00:00,390,11.2,19.61,0,63,28,0,0.21,0.55,"Fall",2.6,2,2,13200,1,3,1,0
+"803","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Value",93,2016-12-07 14:15:00,1,8.61,19.58,0,66,46,0,0,0.14,"Fall",-0.6,2,2,13200,1,3,0,0
+"804","Friends of the Santa Cruz River, Tubac, AZ","USGS-313343110024701","Value",96,2013-03-27 08:45:00,20,4.56,19.62,0,83,46,0,0,0.42,"Winter",-0.3,1,2,13200,2,2,0,0
+"806","U.S. National Park Service","USGS-313343110024701","Value",96,2011-03-01 10:00:00,36,13.4,20.42,0,66,33,0.27,0.27,0.27,"Winter",-0.9,1,2,13200,2,1,0,0
+"809","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Value",96,2016-03-02 10:00:00,13,13.1,19.67,0,81,39,0,0,0,"Winter",1.6,1,2,13200,2,3,0,0
+"810","U.S. National Park Service","USGS-313343110024701","Value",96,2016-03-09 16:15:00,50,6.94,19.54,0,56,30,0.5,0.5,0.5,"Winter",1.6,3,2,13200,2,1,0,0
+"817","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Value",95,2016-12-08 11:00:00,48,12.7,19.64,0,65,34,0,0,0.14,"Fall",-0.6,1,2,13200,1,3,0,0
+"819","U.S. National Park Service","USGS-313343110024701","Value",96,2014-11-12 08:45:00,44,6.22,19.44,0,74,46,0,0,0.15,"Fall",0.6,1,2,13200,1,1,0,0
+"821","U.S. National Park Service","USGS-313343110024701","Value",96,2016-07-06 14:30:00,140,0.48,19.21,0,99,67,0,1.56,1.84,"Monsoon",-0.4,2,1,13200,4,1,0,0
+"826","U.S. National Park Service","USGS-313343110024701","Value",96,2017-03-15 16:00:00,34,5.29,19.51,0,88,43,0,0,0.25,"Winter",0.1,2,2,13200,2,1,0,0
+"828","U.S. National Park Service","USGS-313343110024701","Present Above Quantification Limit",96,2013-08-08 13:15:00,2419.6,0.21,19.16,0,88,60,1.05,1.15,4.82,"Monsoon",-0.3,2,1,13200,4,1,1,1
+"829","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Value",96,2016-03-01 22:00:00,130,13.1,19.67,0,80,38,0,0,0.42,"Winter",1.6,4,2,13200,2,3,0,0
+"830","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Value",96,2015-03-03 07:00:00,190,13.9,19.64,0.22,63,37,0.22,0.22,1,"Winter",0.5,1,2,13200,2,3,0,0
+"842","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Value",93,2016-12-07 13:00:00,40,10.5,19.61,0,66,46,0,0,0.14,"Fall",-0.6,2,2,13200,1,3,0,0
+"861","Friends of the Santa Cruz River, Tubac, AZ","USGS-313343110024701","Value",96,2015-12-28 08:45:00,58,16,19.71,0,49,22,0,0,0.29,"Fall",2.6,1,3,13200,1,2,0,0
+"862","U.S. National Park Service","USGS-313343110024701","Present Above Quantification Limit",96,2013-09-05 11:30:00,2419.6,1.58,19.35,0,94,63,0,0.65,2.66,"Monsoon",-0.3,2,1,13200,4,1,1,1
+"863","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Value",96,2016-03-02 02:00:00,49,13.6,19.68,0,81,39,0,0,0,"Winter",1.6,4,2,13200,2,3,0,0
+"866","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Value",93,2016-12-07 16:00:00,140,7.02,19.55,0,66,46,0,0,0.14,"Fall",-0.6,2,2,13200,1,3,0,0
+"872","Friends of the Santa Cruz River, Tubac, AZ","USGS-313343110024701","Present Above Quantification Limit",96,2010-08-25 07:45:00,2419.6,118,21.86,0.42,98,67,0.42,0.42,5.09,"Monsoon",-1.3,1,4,13200,4,2,1,1
+"875","U.S. National Park Service","USGS-313343110024701","Value",95,2013-02-07 08:00:00,32,6.42,19.7,0,68,34,0,0,0.53,"Winter",-0.4,1,2,13200,2,1,0,0
+"884","U.S. National Park Service","USGS-313343110024701","Value",96,2016-05-11 15:45:00,36,1.3,19.34,0,86,46,0,0,0,"Spring",0.4,2,1,13200,3,1,0,0
+"885","U.S. National Park Service","USGS-313343110024701","Value",96,2016-05-05 16:00:00,130,1.64,19.36,0,94,49,0,0,0.39,"Spring",0.4,2,1,13200,3,1,0,0
+"888","U.S. National Park Service","USGS-313343110024701","Value",96,2015-11-04 10:00:00,110,14.5,19.68,0.09,75,50,0.09,0.34,2.01,"Fall",2.6,1,2,13200,1,1,0,0
+"890","U.S. National Park Service","USGS-313343110024701","Value",96,2012-03-05 11:15:00,51,7.66,19.87,0,80,38,0,0,0.37,"Winter",-0.6,2,2,13200,2,1,0,0
+"892","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Value",96,2016-03-02 06:00:00,26,13.1,19.67,0,81,39,0,0,0,"Winter",1.6,1,2,13200,2,3,0,0
+"896","U.S. National Park Service","USGS-313343110024701","Present Above Quantification Limit",96,2013-07-29 08:15:00,2419.6,0.13,19.14,0,94,64,0.78,0.78,4.43,"Monsoon",-0.4,1,1,13200,4,1,1,1
+"901","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Value",93,2016-12-07 22:00:00,250,11.2,19.62,0,66,46,0,0,0.14,"Fall",-0.6,4,2,13200,1,3,1,0
+"907","Friends of the Santa Cruz River, Tubac, AZ","USGS-313343110024701","Value",96,2016-02-25 08:45:00,18,13.6,19.67,0,72,33,0,0,0.42,"Winter",2.1,1,2,13200,2,2,0,0
+"916","Friends of the Santa Cruz River, Tubac, AZ","USGS-313343110024701","Value",96,2011-10-26 08:00:00,88,1.29,19.66,0,77,38,0,0,0.01,"Fall",-1,1,1,13200,1,2,0,0
+"917","U.S. National Park Service","USGS-313343110024701","Value",93,2016-11-09 15:45:00,35,2.88,19.43,0,81,47,0,0,0,"Fall",-0.7,2,2,13200,1,1,0,0
+"925","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Value",96,2016-02-09 15:00:00,20,11.2,19.62,0,79,37,0,0,0.42,"Winter",2.1,2,2,13200,2,3,0,0
+"931","U.S. National Park Service","USGS-313343110024701","Value",96,2013-05-30 10:00:00,1400,0.49,19.43,0,87,47,0,0,0,"Spring",-0.4,1,1,13200,3,1,1,1
+"935","U.S. National Park Service","USGS-313343110024701","Value",96,2011-05-24 11:45:00,69,1.86,20.07,0,85,46,0,0,0,"Spring",-0.6,2,1,13200,3,1,0,0
+"942","U.S. National Park Service","USGS-313343110024701","Present Above Quantification Limit",96,2011-08-08 13:30:00,2419.6,0.31,19.92,0,89,69,1.35,1.72,4.26,"Monsoon",-0.6,2,1,13200,4,1,1,1
+"943","U.S. Geological Survey-Water Resources Discipline","USGS-313343110024701","Present Above Quantification Limit",96,2016-01-05 08:00:00,2419.6,48.4,20.17,1,58,40,1,1,1.29,"Winter",2.5,1,4,13200,2,3,1,1
+"953","U.S. National Park Service","USGS-313413111024400","Value",96,2012-02-29 14:00:00,20,5.39,19.8,0,60,27,0,0,0.37,"Winter",-0.7,2,2,14200,2,1,0,0
+"966","U.S. National Park Service","USGS-313413111024400","Value",96,2012-04-09 08:30:00,250,3.02,19.7,0,89,48,0,0,0.55,"Spring",-0.5,1,2,14200,3,1,1,0
+"979","U.S. National Park Service","USGS-313413111024400","Present Above Quantification Limit",96,2011-08-03 14:30:00,2419.6,3.37,20.22,0.35,100,68,1.05,1.17,4.08,"Monsoon",-0.6,2,2,14200,4,1,1,1
+"983","U.S. National Park Service","USGS-313413111024400","Value",90,2011-09-27 09:00:00,290,2.88,19.79,0,89,58,0,0,2.56,"Monsoon",-0.8,1,2,14200,4,1,1,0
+"990","U.S. National Park Service","USGS-313413111024400","Value",96,2010-02-03 08:00:00,190,10.1,20.98,0.2,67,46,0.2,0.27,4.06,"Winter",1.2,1,2,14200,2,1,0,0
+"991","U.S. National Park Service","USGS-313413111024400","Value",96,2012-03-05 11:45:00,36,7.66,19.87,0,80,38,0,0,0.37,"Winter",-0.6,2,2,14200,2,1,0,0
+"992","U.S. National Park Service","USGS-313413111024400","Present Above Quantification Limit",96,2010-07-29 09:45:00,2419.6,34.6,21.37,0.07,89,70,0.88,1.02,3.3,"Monsoon",-1,1,4,14200,4,1,1,1
+"1000","U.S. National Park Service","USGS-313413111024400","Present Above Quantification Limit",96,2009-07-30 09:00:00,2419.6,8.77,21.11,0,94,67,0,0.43,4.82,"Monsoon",0.5,1,2,14200,4,1,1,1
+"1009","U.S. National Park Service","USGS-313413111024400","Value",96,2010-05-04 10:00:00,44,9.77,21.09,0,77,40,0,0,0.7,"Spring",-0.2,1,2,14200,3,1,0,0
+"1010","U.S. National Park Service","USGS-313413111024400","Value",96,2012-04-23 11:15:00,150,1.22,19.58,0,98,57,0,0,0,"Spring",-0.5,2,1,14200,3,1,0,0
+"1011","U.S. National Park Service","USGS-313413111024400","Value",96,2011-10-11 08:15:00,96,1.39,19.67,0,82,42,0,0,1.1,"Fall",-1,1,1,14200,1,1,0,0
+"1017","U.S. National Park Service","USGS-313413111024400","Value",96,2011-08-23 15:00:00,1200,1.61,19.69,0,100,70,0,0.13,2.86,"Monsoon",-0.6,2,1,14200,4,1,1,1
+"1019","U.S. National Park Service","USGS-313413111024400","Present Above Quantification Limit",96,2010-08-24 13:00:00,2419.6,11.3,21.03,0,98,67,0,0.39,4.67,"Monsoon",-1.3,2,2,14200,4,1,1,1
+"1023","U.S. National Park Service","USGS-313413111024400","Value",96,2010-06-02 10:30:00,86,0.58,20.58,0,89,52,0,0,0,"Spring",-0.7,1,1,14200,3,1,0,0
+"1026","U.S. National Park Service","USGS-313413111024400","Value",96,2009-09-22 10:45:00,2400,6.58,21,0,93,57,0,0,1.93,"Monsoon",0.7,1,2,14200,4,1,1,1
+"1032","U.S. National Park Service","USGS-313413111024400","Present Above Quantification Limit",87,2011-07-16 09:45:00,2419.6,0.58,19.97,0,97,59,0,0.32,1.56,"Monsoon",-0.5,1,1,14200,4,1,1,1
+"1039","U.S. National Park Service","USGS-313413111024400","Value",96,2009-09-15 14:15:00,120,4.09,20.89,0,88,62,0.53,0.53,2.82,"Monsoon",0.7,2,2,14200,4,1,0,0
+"1043","U.S. National Park Service","USGS-313436111025101","Value",96,2010-03-02 10:45:00,490,10.5,20.99,0,61,36,0.33,0.33,1.12,"Winter",0.8,1,2,15000,2,1,1,0
+"1046","U.S. National Park Service","USGS-313436111025101","Value",96,2011-03-16 15:30:00,45,8.39,20.28,0,85,42,0,0,0.27,"Winter",-0.9,2,2,15000,2,1,0,0
+"1050","U.S. National Park Service","USGS-313436111025101","Present Above Quantification Limit",96,2011-08-03 14:45:00,2419.6,3.2,20.21,0.35,100,68,1.05,1.17,4.08,"Monsoon",-0.6,2,2,15000,4,1,1,1
+"1053","U.S. National Park Service","USGS-313436111025101","Value",96,2012-02-29 14:15:00,30,5.11,19.79,0,60,27,0,0,0.37,"Winter",-0.7,2,2,15000,2,1,0,0
+"1065","U.S. National Park Service","USGS-313436111025101","Value",96,2011-11-01 10:00:00,64,1.29,19.65,0,86,43,0,0,0,"Fall",-1.1,1,1,15000,1,1,0,0
+"1071","U.S. National Park Service","USGS-313436111025101","Value",96,2011-07-27 09:45:00,410,1.29,20.06,0,84,63,0.03,0.52,2.96,"Monsoon",-0.5,1,1,15000,4,1,1,0
+"1072","U.S. National Park Service","USGS-313436111025101","Value",96,2011-04-20 16:00:00,74,3.72,20.1,0,84,47,0,0,0.13,"Spring",-0.7,2,2,15000,3,1,0,0
+"1077","U.S. National Park Service","USGS-313436111025101","Value",96,2012-05-14 14:45:00,290,0.53,19.5,0,94,51,0,0.95,0.95,"Spring",-0.3,2,1,15000,3,1,1,0
+"1080","U.S. National Park Service","USGS-313436111025101","Present Above Quantification Limit",96,2009-09-22 11:00:00,2419.6,6.06,20.98,0,93,57,0,0,1.93,"Monsoon",0.7,2,2,15000,4,1,1,1
+"1092","U.S. National Park Service","USGS-313436111025101","Value",96,2010-09-29 13:30:00,100,3.72,20.3,0,90,56,0,0,1.2,"Monsoon",-1.6,2,2,15000,4,1,0,0
+"1099","U.S. National Park Service","USGS-313436111025101","Value",96,2013-05-14 10:15:00,130,0.3,19.4,0,89,32,0,0,0,"Spring",-0.4,1,1,15000,3,1,0,0
+"1100","U.S. National Park Service","USGS-313436111025101","Present Above Quantification Limit",96,2010-01-21 08:30:00,2419.6,4.69,21.09,0.25,60,42,0.92,0.92,1.12,"Winter",1.5,1,2,15000,2,1,1,1
+"1103","U.S. National Park Service","USGS-313436111025101","Value",96,2011-03-30 10:45:00,33,11.3,20.36,0,81,42,0,0,0.04,"Winter",-0.9,1,2,15000,2,1,0,0
+"1110","U.S. National Park Service","USGS-313436111025101","Value",96,2012-03-26 10:00:00,130,8.42,19.89,0,81,45,0,0.2,0.55,"Winter",-0.6,1,2,15000,2,1,0,0
+"1118","U.S. Geological Survey-Water Resources Discipline","USGS-313542111025801","Value",96,2016-12-09 16:30:00,25,4.92,19.5,0,66,32,0,0,0.14,"Fall",-0.6,3,2,16600,1,3,0,0
+"1119","Friends of the Santa Cruz River, Tubac, AZ","USGS-313854111025701","Present Above Quantification Limit",89,2011-09-28 09:30:00,2419.6,3.04,19.8,0,91,55,0,0,2.56,"Monsoon",-0.8,1,2,22000,4,2,1,1
+"1123","Friends of the Santa Cruz River, Tubac, AZ","USGS-313854111025701","Value",96,2015-11-19 08:15:00,84,16,19.71,0,63,28,0,0.21,0.55,"Fall",2.6,1,4,22000,1,2,0,0
+"1126","Friends of the Santa Cruz River, Tubac, AZ","USGS-313854111025701","Value",96,2011-04-27 07:45:00,310,6.87,20.26,0,84,44,0,0,0.13,"Spring",-0.7,1,2,22000,3,2,1,0
+"1127","Friends of the Santa Cruz River, Tubac, AZ","USGS-313854111025701","Value",95,2009-10-27 07:45:00,390,5.58,20.99,0,79,38,0,0,0.16,"Fall",1,1,2,22000,1,2,1,0
+"1129","Friends of the Santa Cruz River, Tubac, AZ","USGS-313854111025701","Present Above Quantification Limit",96,2010-07-28 07:15:00,2419.6,47.8,21.52,0.74,85,68,0.81,0.97,3.23,"Monsoon",-1,1,4,22000,4,2,1,1
