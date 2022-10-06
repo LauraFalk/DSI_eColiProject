@@ -830,6 +830,6 @@ Season and temperature are also extremely strongly correlated. It may make sense
 # Export data for analysis in python.
 ```{r}
 write.csv(data_Merge3 %>%
-            select("Previous30Precip", "Tmin..F.", "Discharge_CFS", "Stage","NinXTS", "TOD","ACO_Numeric", "DistFromSonoita","ecoli_235", "ecoli_575" ), "Data/Processed/ecoli_attributed.csv")
+            select("Previous30Precip", "Discharge_CFS", "Stage","NinXTS", "TOD","ACO_Numeric", "DistFromSonoita","ecoli_235", "ecoli_575" ), "Data/Processed/ecoli_attributed.csv")
 ```
 
