@@ -154,4 +154,3 @@ print("Accuracy:",metrics.accuracy_score(x_test_236, ytestboo))
 
 # Laura - Your variable name is 235 not 236 - reverify which one I'm supposed to use.
 
-## Laura value error. Classification metrics error. Why is this a continuous multioutput and binary target?
