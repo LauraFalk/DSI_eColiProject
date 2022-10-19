@@ -493,15 +493,23 @@ data_Merge2 <- data_Merge %>%
 ```
 
 
-Look at what the data currently looks like. The red line is the actual standard for warm water effluent in AZ. The blue dotted line indicates the state standard for an average of three+ measurements. It is not technically applicable here, but gives a baseline. It may  be used to flag "Concerning-but-not-technically-bad" levels of E. coli.
+Look at what the data currently looks like. 
+
+The red line is 235, the single sample maximum for full body contact in Arizona. 
+
+The blue dotted line indicates the state standard for an average of three+ measurements (full body contact in Arizona). It is not technically applicable here, but gives a baseline. It may  be used to flag "Concerning-but-not-technically-bad" levels of E. coli.
+
+The green line is 575, the single sampe maximum for partial body contact in Arizona. 
 ```{r}
 data_Merge2 %>%
   ggplot(aes(x=Discharge_CFS, y=StandardizedResult)) +
   geom_point()+
   geom_hline(yintercept=126, linetype="dashed", 
-                color = "blue", size=0.2)+
+                color = "blue", size=0.2) +
   geom_hline(yintercept=235, linetype="dashed", 
-                color = "red", size=0.2)
+                color = "red", size=0.2)+
+  geom_hline(yintercept=575, linetype="dashed", 
+                color = "dark green", size=0.2)
 ```
 
 Now I want to see what it looks like without the outlying discharge values.
@@ -513,7 +521,9 @@ data_Merge2 %>%
   geom_hline(yintercept=126, linetype="dashed", 
                 color = "blue", size=0.2) +
   geom_hline(yintercept=235, linetype="dashed", 
-                color = "red", size=0.2)
+                color = "red", size=0.2)+
+  geom_hline(yintercept=575, linetype="dashed", 
+                color = "dark green", size=0.2)
 ```
 Now I want to see what it looks like without the outlying discharge values.
 None of these graphs appear to have a random distribution, but it is muddied.
@@ -525,7 +535,9 @@ data_Merge2 %>%
   geom_hline(yintercept=126, linetype="dashed", 
                 color = "blue", size=0.2) +
   geom_hline(yintercept=235, linetype="dashed", 
-                color = "red", size=0.2)
+                color = "red", size=0.2)+
+  geom_hline(yintercept=575, linetype="dashed", 
+                color = "dark green", size=0.2)
 ```
 
 
@@ -582,7 +594,9 @@ data_Merge2 %>%
   geom_hline(yintercept=126, linetype="dashed", 
                 color = "blue", size=0.2) +
   geom_hline(yintercept=235, linetype="dashed", 
-                color = "red", size=0.2)
+                color = "red", size=0.2)+
+  geom_hline(yintercept=575, linetype="dashed", 
+                color = "dark green", size=0.2)
 ```
 Graph TMin.
 It is of note that the max only happens above freezing. This may actually be more meaningful than Tmax. The minimum survivable temperature likely has a significant impact on the buggies.
@@ -594,7 +608,9 @@ data_Merge2 %>%
   geom_hline(yintercept=126, linetype="dashed", 
                 color = "blue", size=0.2) +
   geom_hline(yintercept=235, linetype="dashed", 
-                color = "red", size=0.2)
+                color = "red", size=0.2)+
+  geom_hline(yintercept=575, linetype="dashed", 
+                color = "dark green", size=0.2)
 ```
 
 There is probably a better source for precipication, but I'd like to take a look at it. It may be correlated to flow. I'll have to check this later.
@@ -606,7 +622,9 @@ data_Merge2 %>%
   geom_hline(yintercept=126, linetype="dashed", 
                 color = "blue", size=0.2) +
   geom_hline(yintercept=235, linetype="dashed", 
-                color = "red", size=0.2)
+                color = "red", size=0.2)+
+  geom_hline(yintercept=575, linetype="dashed", 
+                color = "dark green", size=0.2)
 ```
 Now I want to look at season. According to the NPS protocol the seasons in southern Arizona are:
 Fall (October 1 - December 30)
@@ -701,7 +719,9 @@ data_Merge3 %>%
   geom_hline(yintercept=126, linetype="dashed", 
                 color = "blue", size=0.2) +
   geom_hline(yintercept=235, linetype="dashed", 
-                color = "red", size=0.2)
+                color = "red", size=0.2)+
+  geom_hline(yintercept=575, linetype="dashed", 
+                color = "dark green", size=0.2)
 ```
 #Notes on above diagram: Monsoon values seem significantly above blue line. Winter values have many less maximum values.
 
@@ -718,7 +738,9 @@ data_Merge3 %>%
   geom_hline(yintercept=126, linetype="dashed", 
                 color = "blue", size=0.2) +
   geom_hline(yintercept=235, linetype="dashed", 
-                color = "red", size=0.2)
+                color = "red", size=0.2)+
+  geom_hline(yintercept=575, linetype="dashed", 
+                color = "dark green", size=0.2)
 ```
 
 I should change the categorical variables back to numeric for corrplot. 
