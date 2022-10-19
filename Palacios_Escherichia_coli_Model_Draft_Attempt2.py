@@ -99,6 +99,7 @@ ec_x_scl = scaler_ec_x.fit_transform(ec_x)
 
 
 ########################### Classification - written by Tousi et. al
+
 def Classifier (x, y, model, P): #### Note - Only works for binary classification
     # p is number of iteration of 5 fold CV
     confmax_ts_p_iteration = np.zeros((P, 2, 2))
@@ -223,40 +224,9 @@ def Classifier (x, y, model, P): #### Note - Only works for binary classificatio
     return TPR_test, TNR_test, FNR_test, FPR_test, TPR_train, TNR_train, FNR_train, FPR_train
     # return
 
-################# Hyperparameter Tunning for SVM #############
-d_C = 0.1
-C_uplim = 3.501
-C_lolim = 0.001
-#
-d_gamm = 0.1
-gamm_uplim = 52
-gamm_lolim = 48.001
-#
-Test_and_train_opt_loop_metric = np.zeros(((mt.ceil((gamm_uplim-gamm_lolim)/d_gamm)*mt.ceil((C_uplim-C_lolim)/d_C)), 10))
-#
-for j in range(mt.ceil((gamm_uplim-gamm_lolim)/d_gamm)):
-    for i in range(mt.ceil((C_uplim-C_lolim)/d_C)):
-        C = C_lolim + i*d_C
-        gamm = gamm_lolim + j*d_gamm
-        m = i + j *(mt.ceil((C_uplim-C_lolim)/d_C))
-        Test_and_train_opt_loop_metric[m, 0:8] = Classifier(X_Ec_scl_1_sc, y_Ec_label_1, SVC(kernel='rbf', C=C, gamma=gamm, class_weight='balanced'),1)
-        Test_and_train_opt_loop_metric[m, -2] = C
-        Test_and_train_opt_loop_metric[m, -1] = gamm
-#
-        print('C:', C)
-    print('gamm:', gamm)
-#
-#
-#
-col_names = ['TPR_test','TNR_test','FNR_test','FPR_test', 'TPR_train', 'TNR_train', 'FPR_train', 'FNR_train', 'param_3', 'param2']
-pdd = pd.DataFrame(Test_and_train_opt_loop_metric, columns=col_names).to_excel('Test_and_train_opt_loop_metric_SVM_FIS_1.xlsx')
-os.startfile('Test_and_train_opt_loop_metric_SVM_FIS_1.xlsx')
-# #
 
-#LP Add sound so I know when to pay attention
-winsound.Beep(340, 200)
 
-################## Hyperparameter Tunning for Log and Ridge regression   #############
+################## Hyperparameter Tunning for Log regression   #############
 
 d_w = 0.1
 w_uplim = 5.001
@@ -273,7 +243,7 @@ for j in range(mt.ceil((w_uplim-w_lolim)/d_w)):
     for i in range(mt.ceil((C_uplim-C_lolim)/d_C)):
         C = C_lolim + i*d_C
         w = w_lolim + j*d_w
-        weg = {0: w, 1: 1} ## Note for L_126, weg = {0: 1, 1: w}. For L_1 weg = {0: w, 1: 1}
+        weg = {0: 1, 1: w} ## Note for L_126, weg = {0: 1, 1: w}. For L_1 weg = {0: w, 1: 1}
         m = i + j *(mt.ceil((C_uplim-C_lolim)/d_C))
         Test_and_train_opt_loop_metric[m, 0:8] = Classifier(ec_x_scl,ec_236, LogisticRegression(C=C, class_weight=weg),1)
         Test_and_train_opt_loop_metric[m, -2] = C
@@ -288,7 +258,69 @@ os.startfile('Test_and_train_opt_loop_metric_LR_LMP_236.xlsx')
 #Add sound so I know when to pay attention
 winsound.Beep(340, 200)
 
+################## Hyperparameter Tunning Ridge regression   #############
+
+d_w = 0.1
+w_uplim = 5.001
+w_lolim = 0.001
+
+d_C = 0.1
+C_uplim = 3.001
+C_lolim = 0.001
 
 
+Test_and_train_opt_loop_metric = np.zeros(((mt.ceil((w_uplim-w_lolim)/d_w)*mt.ceil((C_uplim-C_lolim)/d_C)), 10))
+
+for j in range(mt.ceil((w_uplim-w_lolim)/d_w)):
+    for i in range(mt.ceil((C_uplim-C_lolim)/d_C)):
+        C = C_lolim + i*d_C
+        w = w_lolim + j*d_w
+        weg = {0: 1, 1: w} ## Note for L_126, weg = {0: 1, 1: w}. For L_1 weg = {0: w, 1: 1}
+        m = i + j *(mt.ceil((C_uplim-C_lolim)/d_C))
+        Test_and_train_opt_loop_metric[m, 0:8] = Classifier(ec_x_scl,ec_236, RidgeClassifier(alpha=C, class_weight=weg),1)
+        Test_and_train_opt_loop_metric[m, -2] = C
+        Test_and_train_opt_loop_metric[m, -1] = w
+
+col_names = ['TPR_test','TNR_test','FNR_test','FPR_test', 
+'TPR_train', 'TNR_train', 'FnR_train', 'FpR_train', 
+'param_1', 'param2']
+pdd = pd.DataFrame(Test_and_train_opt_loop_metric, columns=col_names).to_excel('Test_and_train_opt_loop_metric_RC_LMP_236.xlsx')
+os.startfile('Test_and_train_opt_loop_metric_RC_LMP_236.xlsx')
+
+#Add sound so I know when to pay attention
+winsound.Beep(340, 200)
+
+################# Hyperparameter Tunning for SVM #############
+d_C = 0.1
+C_uplim = 3.501
+C_lolim = 0.001
+#
+d_gamm = 0.1
+gamm_uplim = 52
+gamm_lolim = 48.001
+#
+Test_and_train_opt_loop_metric = np.zeros(((mt.ceil((gamm_uplim-gamm_lolim)/d_gamm)*mt.ceil((C_uplim-C_lolim)/d_C)), 10))
+#
+for j in range(mt.ceil((gamm_uplim-gamm_lolim)/d_gamm)):
+    for i in range(mt.ceil((C_uplim-C_lolim)/d_C)):
+        C = C_lolim + i*d_C
+        gamm = gamm_lolim + j*d_gamm
+        m = i + j *(mt.ceil((C_uplim-C_lolim)/d_C))
+        Test_and_train_opt_loop_metric[m, 0:8] = Classifier(ec_x_scl,ec_236, SVC(kernel='rbf', C=C, gamma=gamm, class_weight='balanced'),1)
+        Test_and_train_opt_loop_metric[m, -2] = C
+        Test_and_train_opt_loop_metric[m, -1] = gamm
+#
+        print('C:', C)
+    print('gamm:', gamm)
+#
+#
+#
+col_names = ['TPR_test','TNR_test','FNR_test','FPR_test', 'TPR_train', 'TNR_train', 'FPR_train', 'FNR_train', 'param_3', 'param2']
+pdd = pd.DataFrame(Test_and_train_opt_loop_metric, columns=col_names).to_excel('Test_and_train_opt_loop_metric_SVM_LMP_236.xlsx')
+os.startfile('Test_and_train_opt_loop_metric_SVM_LMP_236.xlsx')
+# #
+
+#LP Add sound so I know when to pay attention
+winsound.Beep(340, 200)
 
 
