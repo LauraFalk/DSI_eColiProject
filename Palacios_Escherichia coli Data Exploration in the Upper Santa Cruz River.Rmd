@@ -555,9 +555,20 @@ remove(Rawclimate)
 
 What about the sum of previous three-days precipitation
 ```{r}
-DailyClimate$Previous3Precip <-  rollsumr(DailyClimate$Precipitation..in., k = 3, fill = NA)
-DailyClimate$Previous7Precip <-  rollsumr(DailyClimate$Precipitation..in., k = 7, fill = NA)
-DailyClimate$Previous30Precip <-  rollsumr(DailyClimate$Precipitation..in., k = 30, fill = NA)
+# Use lag to include only previous data so that forecasting may occur on a more timely basis.Min temp is not published until the day after.
+DailyClimate$Previous3Precip <-  lag(rollsumr(DailyClimate$Precipitation..in., k = 3, fill = NA))
+DailyClimate$Previous7Precip <-  lag(rollsumr(DailyClimate$Precipitation..in., k = 7, fill = NA))
+DailyClimate$Previous30Precip <-  lag(rollsumr(DailyClimate$Precipitation..in., k = 30, fill = NA))
+
+```
+
+Lag Tmax an Tmin
+```{r}
+# Use the previous day's Tmin due to data posting interval. This may be used for future forecasting.
+DailyClimate$PreviousTmin <- lag(DailyClimate$Tmin..F.)
+# Use the previous day's Tmin due to data posting interval. This may be used for future forecasting.
+DailyClimate$PreviousTmax <- lag(DailyClimate$Tmax..F.)
+
 ```
 
 Fix the date.
@@ -579,7 +590,7 @@ data_Merge2<- left_join(data_Merge2,
 
 
 data_Merge2 %>%
-  filter(is.nan(Tmax..F.))
+  filter(is.nan(PreviousTmax))
 
 ```
 
@@ -588,8 +599,8 @@ This isn't as great as I thought it would be.
 Google says temps of 39-113°F are survivable for e. coli and ideal is 98.6°F. THe majority of the samples are survivable.
 ```{r}
 data_Merge2 %>%
-  filter(!is.nan(Tmax..F.)) %>%
-  ggplot(aes(x=Tmax..F., y=StandardizedResult)) +
+  filter(!is.nan(PreviousTmax)) %>%
+  ggplot(aes(x=PreviousTmax, y=StandardizedResult)) +
   geom_point() +
   geom_hline(yintercept=126, linetype="dashed", 
                 color = "blue", size=0.2) +
@@ -601,9 +612,10 @@ data_Merge2 %>%
 Graph TMin.
 It is of note that the max only happens above freezing. This may actually be more meaningful than Tmax. The minimum survivable temperature likely has a significant impact on the buggies.
 ```{r}
+
 data_Merge2 %>%
-  filter(!is.nan(Tmin..F.)) %>%
-  ggplot(aes(x=Tmin..F., y=StandardizedResult)) +
+  filter(!is.nan(PreviousTmin)) %>%
+  ggplot(aes(x=PreviousTmin, y=StandardizedResult)) +
   geom_point() +
   geom_hline(yintercept=126, linetype="dashed", 
                 color = "blue", size=0.2) +
@@ -705,7 +717,7 @@ data_Merge2$TOD <- c(4, 1, 2, 3, 4)[as.numeric(data_Merge2$TOD)]
 
 # Columns are organized so that the "metadata" columns are in the beginning. These will not be used for correlation views.
 data_Merge3 <- data_Merge2 %>%
-  select(ActivityConductingOrganizationText, MonitoringLocationIdentifier, QuantificationLimit, DailyFlowCount, DateTime2, StandardizedResult, Discharge_CFS, USGS_Staff, QuantificationLimit, Precipitation..in., Tmax..F., Tmin..F., Previous3Precip, Previous7Precip, Previous30Precip, Season, NinXTS, TOD, Stage, DistFromSonoita)
+  select(ActivityConductingOrganizationText, MonitoringLocationIdentifier, QuantificationLimit, DailyFlowCount, DateTime2, StandardizedResult, Discharge_CFS, USGS_Staff, QuantificationLimit, Precipitation..in., PreviousTmax, PreviousTmin, Previous3Precip, Previous7Precip, Previous30Precip, Season, NinXTS, TOD, Stage, DistFromSonoita)
 
 # Remove old data.
 remove(data_Merge, data_Merge2, DailyClimate, Nin, NinXTS)
@@ -808,7 +820,7 @@ Use the *Training* data to train the models. Test data comes in for validation p
 ```{r}
 # Ensure that only numeric data is contained. There was a previous cleanup but it still contained metadata.
 traindata_numeric <- traindata %>%
-  select(c("StandardizedResult", "ecoli_235","ecoli_575", "Discharge_CFS", "USGS_Staff", "Precipitation..in.", "Tmax..F.", "Tmin..F.", "Previous3Precip", "Previous7Precip", "Previous30Precip", "NinXTS", "TOD", "Stage", "SeasonNumeric", "ACO_Numeric", "DistFromSonoita"))
+  select(c("StandardizedResult", "ecoli_235","ecoli_575", "Discharge_CFS", "USGS_Staff", "Precipitation..in.", "PreviousTmax", "PreviousTmin", "Previous3Precip", "Previous7Precip", "Previous30Precip", "NinXTS", "TOD", "Stage", "SeasonNumeric", "ACO_Numeric", "DistFromSonoita"))
 
 # I can look at pairs
 # Now that I've added more variables this isn't exactly useful.
@@ -826,21 +838,21 @@ corrplot(cor, method = 'square', order = 'FPC', type = 'upper', diag = FALSE, ad
 ```{r}
 # looking at only ecoli_575
 cor2 <- cor(traindata %>%
-  select(c("ecoli_575", "Previous30Precip", "Tmin..F.", "Discharge_CFS", "Stage","NinXTS", "TOD","ACO_Numeric", "DistFromSonoita")))
+  select(c("ecoli_575", "Previous30Precip", "PreviousTmin", "Discharge_CFS", "Stage","NinXTS", "TOD","ACO_Numeric", "DistFromSonoita")))
 
 corrplot(cor2, method = 'square', order = 'FPC', type = 'upper', diag = FALSE, addCoef.col="black", number.cex=0.75)
 ```
 ```{r}
 # looking at only ecoli_235
 cor3<- cor(traindata %>%
-  select(c("ecoli_235", "Previous30Precip", "Tmin..F.", "Discharge_CFS", "Stage","NinXTS", "TOD","ACO_Numeric", "DistFromSonoita")))
+  select(c("ecoli_235", "Previous30Precip", "PreviousTmin", "Discharge_CFS", "Stage","NinXTS", "TOD","ACO_Numeric", "DistFromSonoita")))
 
 corrplot(cor3, method = 'square', order = 'FPC', type = 'upper', diag = FALSE, addCoef.col="black", number.cex=0.75)
 ```
 ```{r}
 # This looks at both classifications together. Repeat of previous but with limited predictors.
 cor4<- cor(traindata %>%
-  select(c("ecoli_235", "ecoli_575", "Previous30Precip", "Tmin..F.", "Discharge_CFS", "Stage","NinXTS", "TOD","ACO_Numeric", "DistFromSonoita")))
+  select(c("ecoli_235", "ecoli_575", "Previous30Precip", "PreviousTmin", "Discharge_CFS", "Stage","NinXTS", "TOD","ACO_Numeric", "DistFromSonoita")))
 
 corrplot(cor4, method = 'square', order = 'FPC', type = 'upper', diag = FALSE, addCoef.col="black", number.cex=0.75)
 ```
