@@ -70,7 +70,7 @@ from sklearn.feature_selection import f_classif
 from sklearn.metrics import precision_score, recall_score, roc_curve
 
 
-inp = pd.read_excel(os.path.join(os.getcwd(),'Input_76_data point.xlsx'))
+inp = pd.read_excel(os.path.join(os.getcwd(),'Tousi_Replication/Input_76_data point.xlsx'))
 input_data = pd.DataFrame(inp)
 input_data.drop(input_data.iloc[:, 0:4], axis=1, inplace=True)
 input_data.rename(columns=input_data.iloc[0], inplace=True)
@@ -104,7 +104,8 @@ X_Ec = np.delete(X_Ec, [10, 11, 12], axis=1)
 
 X_Ec_1 = np.delete(X_Ec, [0, 4, 5, 6, 8], axis=1)
 
-X_Ec_1_snc = np.delete(X_Ec_pure, [0, 4, 5, 6, 8, 9], axis=1) ##### snc = means with sediment data for noncampring having 7 features of  RH, Air temp, Turb τ*, S_Ec, D50, pH
+#Removed this, is not used in output - LMP
+#X_Ec_1_snc = np.delete(X_Ec_pure, [0, 4, 5, 6, 8, 9], axis=1) ##### snc = means with sediment data for noncampring having 7 features of  RH, Air temp, Turb τ*, S_Ec, D50, pH
 
 X_Ec_1_sc = np.delete(X_Ec_pure, [0, 4, 5, 6, 8, 9, 1, 12], axis=1) ##### sc = means with sediment data for campring having 5 features of  RH, Air temp, Turb τ*, S_Ec
 # print(X_Ec_1_sc)
@@ -115,11 +116,13 @@ X_Ec_126_5f = np.delete(X_Ec_126, [1], axis=1)
 
 # print(X_Ec_126_5f)
 
-X_Ec_126_snc = np.delete(X_Ec_pure, [3, 5, 6, 7, 10, 12], axis=1)
+# Removed this, is not used in output - LMP
+# X_Ec_126_snc = np.delete(X_Ec_pure, [3, 5, 6, 7, 10, 12], axis=1)
 
 X_Ec_126_sc = np.delete(X_Ec_pure, [3, 5, 6, 7, 10, 12, 9, ], axis=1)
 
-X_Ec_126_sc_5f = np.delete(X_Ec_126_sc, [], axis=1)
+#Removed this, is not used in output - LMP
+# X_Ec_126_sc_5f = np.delete(X_Ec_126_sc, [], axis=1)
 # #
 # print(X_Ec_126_sc_5f)
 ############### TC  ##############################
@@ -134,17 +137,11 @@ y_Ec_label_1 = np.where(y_Ec > 1, 1, 0) ########### Positive label is 1, means y
 
 y_Ec_label_126 = np.where(y_Ec > 126, 1, 0) ########### Positive label is 1, means y_lab = 1
 
-
-
 # rho_1, pval = stats.spearmanr(y_Ec_label_126,X_Ec)
 # pd.DataFrame(rho_1).to_excel('rho_1.xlsx')
 # os.startfile('rho_1.xlsx')
 
 ################# Forward feature selection
-
-
-
-
 
 # ##################### rho
 # Xy_labeld, pval = stats.spearmanr(y_Ec_label, X_Ec)
@@ -211,8 +208,9 @@ y_Ec_label_126 = np.where(y_Ec > 126, 1, 0) ########### Positive label is 1, mea
 scalerX_Ec_1 = MinMaxScaler()
 X_Ec_scl_1 = scalerX_Ec_1.fit_transform(X_Ec_1)
 
-scalerX_Ec_1_snc = MinMaxScaler()
-X_Ec_scl_1_snc = scalerX_Ec_1_snc.fit_transform(X_Ec_1_snc)
+# Removed this, is not used in output - LMP
+# scalerX_Ec_1_snc = MinMaxScaler()
+# X_Ec_scl_1_snc = scalerX_Ec_1_snc.fit_transform(X_Ec_1_snc)
 
 scalerX_Ec_1_sc = MinMaxScaler()
 X_Ec_scl_1_sc = scalerX_Ec_1_sc.fit_transform(X_Ec_1_sc)
@@ -221,17 +219,20 @@ X_Ec_scl_1_sc = scalerX_Ec_1_sc.fit_transform(X_Ec_1_sc)
 scalerX_Ec_126 = MinMaxScaler()
 X_Ec_scl_126 = scalerX_Ec_126.fit_transform(X_Ec_126)
 
-scalerX_Ec_126_5f = MinMaxScaler()
-X_Ec_scl_126_5f = scalerX_Ec_126_5f.fit_transform(X_Ec_126_5f)
+# Removed this, is not used in output - LMP
+# scalerX_Ec_126_5f = MinMaxScaler()
+# X_Ec_scl_126_5f = scalerX_Ec_126_5f.fit_transform(X_Ec_126_5f)
 
-scalerX_Ec_126_snc = MinMaxScaler()
-X_Ec_scl_126_snc = scalerX_Ec_126_snc.fit_transform(X_Ec_126_snc)
+# Removed this, is not used in output - LMP
+# scalerX_Ec_126_snc = MinMaxScaler()
+# X_Ec_scl_126_snc = scalerX_Ec_126_snc.fit_transform(X_Ec_126_snc)
 
 scalerX_Ec_126_sc = MinMaxScaler()
 X_Ec_scl_126_sc = scalerX_Ec_126_sc.fit_transform(X_Ec_126_sc)
 
-scalerX_Ec_126_sc_5f = MinMaxScaler()
-X_Ec_scl_126_sc_5f = scalerX_Ec_126_sc_5f.fit_transform(X_Ec_126_sc_5f)
+# Removed this, is not used in output - LMP
+# scalerX_Ec_126_sc_5f = MinMaxScaler()
+# X_Ec_scl_126_sc_5f = scalerX_Ec_126_sc_5f.fit_transform(X_Ec_126_sc_5f)
 
 ################################################ THIS CODE need to be revised not verficed
 # def backward_feature_selection(XX, YY, model, feature_labels):
@@ -414,9 +415,9 @@ def Classifier (x, y, model, P): #### Note this Clssider only works for binary c
             # pd.DataFrame(np.concatenate((train_index,test_index))).to_excel(f'fold:{b}.xlsx')         # ################### Ploynominal Kernel
             # os.startfile(f'fold: {b}.xlsx')
             # b += 1
-            # poly_trs = PolynomialFeatures(degree=2, interaction_only=False, include_bias=False)
-            # X_train = poly_trs.fit_transform(X_train)
-            # X_test = poly_trs.fit_transform(X_test)
+            #poly_trs = PolynomialFeatures(degree=2, interaction_only=False, include_bias=False)
+            #X_train = poly_trs.fit_transform(X_train)
+            #X_test = poly_trs.fit_transform(X_test)
             # # print(X_train.shape)
             ##################### Model fit
             model.fit(X_train, y_train)
@@ -528,43 +529,49 @@ def Classifier (x, y, model, P): #### Note this Clssider only works for binary c
 
 
 ################# Hyperparameter Tunning for SVM #############
-# d_C = 0.1
-# C_uplim = 100
-# C_lolim = 0.001
+d_C = 0.2
+C_uplim = 41
+C_lolim = 35
 #
-# d_gamm = 0.1
-# gamm_uplim = 100
-# gamm_lolim = 0.001
+d_gamm = 0.1
+gamm_uplim = 5
+gamm_lolim = 1
 #
-# Test_and_train_opt_loop_metric = np.zeros(((mt.ceil((gamm_uplim-gamm_lolim)/d_gamm)*mt.ceil((C_uplim-C_lolim)/d_C)), 10))
+Test_and_train_opt_loop_metric = np.zeros(((mt.ceil((gamm_uplim-gamm_lolim)/d_gamm)*mt.ceil((C_uplim-C_lolim)/d_C)), 10))
 #
-# for j in range(mt.ceil((gamm_uplim-gamm_lolim)/d_gamm)):
-#     for i in range(mt.ceil((C_uplim-C_lolim)/d_C)):
-#         C = C_lolim + i*d_C
-#         gamm = gamm_lolim + j*d_gamm
-#         m = i + j *(mt.ceil((C_uplim-C_lolim)/d_C))
-#         Test_and_train_opt_loop_metric[m, 0:8] = Classifier(X_Ec_scl_1_sc, y_Ec_label_1, SVC(kernel='rbf', C=C, gamma=gamm, class_weight='balanced'),1)
-#         Test_and_train_opt_loop_metric[m, -2] = C
-#         Test_and_train_opt_loop_metric[m, -1] = gamm
+for j in range(mt.ceil((gamm_uplim-gamm_lolim)/d_gamm)):
+    for i in range(mt.ceil((C_uplim-C_lolim)/d_C)):
+        C = C_lolim + i*d_C
+        gamm = gamm_lolim + j*d_gamm
+        m = i + j *(mt.ceil((C_uplim-C_lolim)/d_C))
+        Test_and_train_opt_loop_metric[m, 0:8] = Classifier(X_Ec_scl_1, y_Ec_label_1, SVC(kernel='rbf', C=C, gamma=gamm, class_weight='balanced'),1)
+        Test_and_train_opt_loop_metric[m, -2] = C
+        Test_and_train_opt_loop_metric[m, -1] = gamm
 #
-#         print('C:', C)
-#     print('gamm:', gamm)
+        print('C:', C)
+    print('gamm:', gamm)
 #
 #
 #
-# col_names = ['TPR_test','TNR_test','FNR_test','FPR_test', 'TPR_train', 'TNR_train', 'FPR_train', 'FNR_train', 'param_3', 'param2']
-# pdd = pd.DataFrame(Test_and_train_opt_loop_metric, columns=col_names).to_excel('Test_and_train_opt_loop_metric_copy3.xlsx')
-# os.startfile('Test_and_train_opt_loop_metric_copy3.xlsx')
+col_names = ['TPR_test','TNR_test','FNR_test','FPR_test', 'TPR_train', 'TNR_train', 'FPR_train', 'FNR_train', 'param_3', 'param2']
+pdd = pd.DataFrame(Test_and_train_opt_loop_metric, columns=col_names).to_excel('Tousi_Replication/Tuning_Outputs/Test_and_train_opt_loop_metric_SVM_FES_1.xlsx')
+os.startfile('Tousi_Replication/Tuning_Outputs/Test_and_train_opt_loop_metric_SVM_FES_1.xlsx')
 # #
+
+import winsound
+duration = 200  # milliseconds
+freq = 340  # Hz
+winsound.Beep(freq, duration)
+
 ################## Hyperparameter Tunning for Log and Ridge regression   #############
 
 d_w = 0.1
-w_uplim = 35
-w_lolim = 1
+w_uplim = 3.501
+w_lolim = 0.001
 
 d_C = 0.1
-C_uplim = 100
-C_lolim = 0.001
+C_uplim = 52
+C_lolim = 48.001
 
 
 Test_and_train_opt_loop_metric = np.zeros(((mt.ceil((w_uplim-w_lolim)/d_w)*mt.ceil((C_uplim-C_lolim)/d_C)), 10))
@@ -573,9 +580,9 @@ for j in range(mt.ceil((w_uplim-w_lolim)/d_w)):
     for i in range(mt.ceil((C_uplim-C_lolim)/d_C)):
         C = C_lolim + i*d_C
         w = w_lolim + j*d_w
-        weg = {0: 1, 1: w} ## Note for L_126, weg = {0: 1, 1: w}. For L_1 weg = {0: w, 1: 1}
+        weg = {0: w, 1: 1} ## Note for L_126, weg = {0: 1, 1: w}. For L_1 weg = {0: w, 1: 1}
         m = i + j *(mt.ceil((C_uplim-C_lolim)/d_C))
-        Test_and_train_opt_loop_metric[m, 0:8] = Classifier(X_Ec_scl_126, y_Ec_label_126, LogisticRegression(C=C, class_weight=weg),1)
+        Test_and_train_opt_loop_metric[m, 0:8] = Classifier(X_Ec_scl_1_sc,y_Ec_label_1, RidgeClassifier(alpha=C, class_weight=weg),1)
         Test_and_train_opt_loop_metric[m, -2] = C
         Test_and_train_opt_loop_metric[m, -1] = w
 
@@ -584,9 +591,16 @@ for j in range(mt.ceil((w_uplim-w_lolim)/d_w)):
 
 
 
+
 col_names = ['TPR_test','TNR_test','FNR_test','FPR_test', 'TPR_train', 'TNR_train', 'FnR_train', 'FpR_train', 'param_1', 'param2']
-pdd = pd.DataFrame(Test_and_train_opt_loop_metric, columns=col_names).to_excel('Test_and_train_opt_loop_metric_copy3.xlsx')
-os.startfile('Test_and_train_opt_loop_metric_copy3.xlsx')
+pdd = pd.DataFrame(Test_and_train_opt_loop_metric, columns=col_names).to_excel('Tousi_Replication/Tuning_Outputs/Test_and_train_opt_loop_metric_KRC_FIS_1.xlsx')
+os.startfile('Tousi_Replication/Tuning_Outputs/Test_and_train_opt_loop_metric_KRC_FIS_1.xlsx')
+
+# Added this so I know when to pay attention
+import winsound
+duration = 200  # milliseconds
+freq = 340  # Hz
+winsound.Beep(freq, duration)
 
 ################################ Final models after all CV on hyperparameter tunning_ Final model is trained over all the data set.
 ############# SVM with kerenl rbf for both levels and both feature sets of having sed and excluding sed data
@@ -596,6 +610,9 @@ os.startfile('Test_and_train_opt_loop_metric_copy3.xlsx')
 ########## Final tunned models
 # Classifier(X_Ec_scl_126_sc, y_Ec_label_126, SVC(kernel='rbf', class_weight='balanced', C=0.601, gamma=5.301), 1)
 # Classifier(X_Ec_scl_126, y_Ec_label_126, SVC(kernel='rbf', class_weight='balanced', C=0.301, gamma=5.501), 1)
+
+wegt = {0:2.5, 1:1}
+Classifier(X_Ec_scl_1_sc, y_Ec_label_1, RidgeClassifier(alpha=0.801, class_weight=wegt), 1)
 
 
 

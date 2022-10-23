@@ -22,7 +22,7 @@ y_all = np.concatenate((y_train,y_test))
 
 # Create untuned models. This serves as the baseline
 # Current output:
-# LR: 853
+# LR: 85.3
 # RC: 83.7
 # SVM: 88.5
 logisticRegr = LogisticRegression()
@@ -45,9 +45,9 @@ print('Untrained SVC SCORE: ',score)
 ######################################################
 # Tuned LR gets a score of 83.6 (previous 82.7)
 # {'C': 9.112475289387755, 'penalty': 'l2'}
-parameters_to_tune={"C":np.logspace(0.001,1,100), 
-"penalty":["l1","l2",],
-"solvers" = ['newton-cg', 'lbfgs', 'liblinear']}
+parameters_to_tune={"C":np.logspace(0.001,0,100),"penalty":["l1","l2",]}
+#,"solvers" = ['newton-cg', 'lbfgs', 'liblinear']}
+
 logreg=LogisticRegression()
 logreg_cv=GridSearchCV(logreg,parameters_to_tune,cv=5)
 logreg_cv.fit(x_all,y_all)
@@ -56,8 +56,9 @@ print("tuned hpyerparameters :(best parameters) ",logreg_cv.best_params_)
 print("accuracy :",logreg_cv.best_score_)
 
 ##################################################################
-# Ridge error is 84.0 (previously 83.8)
-# Config: {'alpha': 5.26}
+# Ridge error is 82.6
+# Config: {'alpha': 17.38}
+# Why did this get worse?
 from numpy import arange
 from pandas import read_csv
 from sklearn.model_selection import GridSearchCV
