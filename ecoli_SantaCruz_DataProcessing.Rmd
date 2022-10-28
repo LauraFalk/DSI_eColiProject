@@ -799,6 +799,24 @@ data_Merge3$ecoli_575 <- ifelse(data_Merge3$StandardizedResult > 574.5,1,0)
 ```
 
 
+Determine how balanced the dataset is.
+```{r}
+# Count total rows
+totaln <- data_Merge3 %>%
+  summarise(n = n())
+
+# Total positive at 235 is currently (10/22) 51.6%
+data_Merge3 %>%
+  filter(ecoli_235 ==1) %>% 
+  summarise(n = n())/totaln
+
+# Total positives at 575 is currently (10/22) 42.5%
+data_Merge3 %>%
+  filter(ecoli_575 ==1) %>% 
+  summarise(n = n())/totaln
+
+```
+
 ## Data Exploration 2.0
 
 Now that I've looked at the overall data, make a test and train set to proceed.

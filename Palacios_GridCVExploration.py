@@ -45,8 +45,7 @@ print('Untrained SVC SCORE: ',score)
 ######################################################
 # Tuned LR gets a score of 83.6 (previous 82.7)
 # {'C': 9.112475289387755, 'penalty': 'l2'}
-parameters_to_tune={"C":np.logspace(0.001,0,100),"penalty":["l1","l2",]}
-#,"solvers" = ['newton-cg', 'lbfgs', 'liblinear']}
+parameters_to_tune={"C":np.logspace(-0.1,0.1,1000),"penalty":["l1","l2",],"solver":['newton-cg', 'lbfgs', 'liblinear']}
 
 logreg=LogisticRegression()
 logreg_cv=GridSearchCV(logreg,parameters_to_tune,cv=5)

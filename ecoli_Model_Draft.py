@@ -99,10 +99,8 @@ print(ec_575[16])
 scaler_ec_x = MinMaxScaler()
 ec_x_scl = scaler_ec_x.fit_transform(ec_x)
 
-
-############################# Classification LR and RC - written by Tousi et. al ############################# 
-
-def Classifier (x, y, model, P): #### Note - Only works for binary classification
+############################# Binary Classification LR and RC - written by Tousi et. al ############################# 
+def Classifier (x, y, model, P):
     # p is number of iteration of 5 fold CV
     confmax_ts_p_iteration = np.zeros((P, 2, 2))
     TPR_ts_p_iteration = np.zeros(P)
@@ -110,7 +108,7 @@ def Classifier (x, y, model, P): #### Note - Only works for binary classificatio
     FNR_ts_p_iteration = np.zeros(P)
     FPR_ts_p_iteration = np.zeros(P)
     prfs_array_ts_p_iteration = np.zeros((P, 4, 2))
-
+    ##
     confmax_tr_p_iteration = np.zeros((P, 2, 2))
     TPR_tr_p_iteration = np.zeros(P)
     TNR_tr_p_iteration = np.zeros(P)
@@ -118,6 +116,7 @@ def Classifier (x, y, model, P): #### Note - Only works for binary classificatio
     FPR_tr_p_iteration = np.zeros(P)
     prfs_array_tr_p_iteration = np.zeros((P, 4, 2))
     for p in range(P):
+        # print('Loop: ', p)
         KN = 5
         n = 0
         accr_ts = np.zeros(KN)
@@ -131,7 +130,7 @@ def Classifier (x, y, model, P): #### Note - Only works for binary classificatio
         TN_ts = np.zeros(KN)
         FP_ts = np.zeros(KN)
         FN_ts = np.zeros(KN)
-
+        ##
         accr_tr = np.zeros(KN)
         prfs_array_tr = np.zeros((KN, 4, 2))  # NOTE: right side numbers are for class 1
         confmax_tr = np.zeros((KN, 2, 2))
@@ -147,14 +146,7 @@ def Classifier (x, y, model, P): #### Note - Only works for binary classificatio
         for train_index, test_index in kf_cl.split(x, y):
             X_train, X_test = x[train_index], x[test_index]
             y_train, y_test = y[train_index], y[test_index]
-            #print(train_index)
-            #print(test_index)
-
-
-            #poly_trs = PolynomialFeatures(degree=2, interaction_only=False, include_bias=False) #Turn on for poly
-            #X_train = poly_trs.fit_transform(X_train) # Turn on for poly
-            #X_test = poly_trs.fit_transform(X_test) # Turn on for poly
-            ##################### Model fit
+            ##
             model.fit(X_train, y_train)
             # Metrics on Test set
             confmax_ts[n] = confusion_matrix(y_test, model.predict(X_test))
@@ -168,7 +160,6 @@ def Classifier (x, y, model, P): #### Note - Only works for binary classificatio
             FNR_ts[n] = FN_ts[n]/(TP_ts[n]+FN_ts[n])
             FPR_ts[n] = FP_ts[n]/(FP_ts[n]+TN_ts[n])
             prfs_array_ts[n, :, :] = precision_recall_fscore_support(y_test, model.predict(X_test))
-
             # Metrics on Train set
             confmax_tr[n] = confusion_matrix(y_train, model.predict(X_train))
             accr_tr[n] = accuracy_score(y_train, model.predict(X_train))
@@ -182,8 +173,7 @@ def Classifier (x, y, model, P): #### Note - Only works for binary classificatio
             FPR_tr[n] = FP_tr[n]/(FP_tr[n]+TN_tr[n])
             prfs_array_tr[n, :, :] = precision_recall_fscore_support(y_train, model.predict(X_train))
             n += 1
-
-        # #
+        ##
         confmax_tr_p_iteration[p] = confmax_tr.mean(axis=0)
         TPR_tr_p_iteration[p] = TPR_tr.mean()
         TNR_tr_p_iteration[p] = TNR_tr.mean()
@@ -197,7 +187,6 @@ def Classifier (x, y, model, P): #### Note - Only works for binary classificatio
         FPR_ts_p_iteration[p] = FPR_ts.mean()
         FNR_ts_p_iteration[p] = FNR_ts.mean()
         prfs_array_ts_p_iteration[p] = prfs_array_ts.mean(axis=0)
-
     print('#### train results of all  p iteration ###############################################')
     print('mean of TPR train: ', np.mean(TPR_tr_p_iteration, axis=0))
     print('mean of TNR train: ', np.mean(TNR_tr_p_iteration, axis=0))
@@ -205,7 +194,6 @@ def Classifier (x, y, model, P): #### Note - Only works for binary classificatio
     print('mean of FPR train: ', np.mean(FPR_tr_p_iteration, axis=0))
     print('Train left clmn is cls 0, right clmn cls1, '
           'rows are pression, recal, f1-score, support', np.mean(prfs_array_tr_p_iteration, axis=0))
-
     print('#### test results of all  p iteration ###############################################')
     print('mean of TPR test: ', np.mean(TPR_ts_p_iteration, axis=0))
     print('mean of TNR test: ', np.mean(TNR_ts_p_iteration, axis=0))
@@ -217,34 +205,20 @@ def Classifier (x, y, model, P): #### Note - Only works for binary classificatio
     TNR_test = np.mean(TNR_ts_p_iteration, axis=0)
     FNR_test = np.mean(FNR_ts_p_iteration, axis=0)
     FPR_test = np.mean(FPR_ts_p_iteration, axis=0)
-    #
-    #
     TPR_train = np.mean(TPR_tr_p_iteration, axis=0)
     TNR_train = np.mean(TNR_tr_p_iteration, axis=0)
     FNR_train = np.mean(FNR_tr_p_iteration, axis=0)
     FPR_train = np.mean(FPR_tr_p_iteration, axis=0)
     
-    ###############LMP Addition
-    logisticRegr = LogisticRegression()
-    logisticRegr.fit(X_train, y_train)
-    predictions = logisticRegr.predict(X_test)
-    score = logisticRegr.score(X_test, y_test)
-    print('LMP SCORE: ',score)
-    
-    RidgeClass = RidgeClassifier()
-    RidgeClass.fit(X_train, y_train)
-    predictions = RidgeClass.predict(X_test)
-    score = RidgeClass.score(X_test, y_test)
-    print('RC SCORE: ',score)        
-        
-    ##############End LMP Addition
 
+    ##
     return TPR_test, TNR_test, FNR_test, FPR_test, TPR_train, TNR_train, FNR_train, FPR_train
     # return
 
+
 ############################# Classification KLR and KRC - written by Tousi et. al ############################# 
 
-def ClassifierK (x, y, model, P): #### Note - Only works for binary classification
+def KClassifier (x, y, model, P): #### Note - Only works for binary classification
     # p is number of iteration of 5 fold CV
     confmax_ts_p_iteration = np.zeros((P, 2, 2))
     TPR_ts_p_iteration = np.zeros(P)
@@ -252,7 +226,7 @@ def ClassifierK (x, y, model, P): #### Note - Only works for binary classificati
     FNR_ts_p_iteration = np.zeros(P)
     FPR_ts_p_iteration = np.zeros(P)
     prfs_array_ts_p_iteration = np.zeros((P, 4, 2))
-
+    ##
     confmax_tr_p_iteration = np.zeros((P, 2, 2))
     TPR_tr_p_iteration = np.zeros(P)
     TNR_tr_p_iteration = np.zeros(P)
@@ -273,7 +247,7 @@ def ClassifierK (x, y, model, P): #### Note - Only works for binary classificati
         TN_ts = np.zeros(KN)
         FP_ts = np.zeros(KN)
         FN_ts = np.zeros(KN)
-
+        ##
         accr_tr = np.zeros(KN)
         prfs_array_tr = np.zeros((KN, 4, 2))  # NOTE: right side numbers are for class 1
         confmax_tr = np.zeros((KN, 2, 2))
@@ -289,14 +263,12 @@ def ClassifierK (x, y, model, P): #### Note - Only works for binary classificati
         for train_index, test_index in kf_cl.split(x, y):
             X_train, X_test = x[train_index], x[test_index]
             y_train, y_test = y[train_index], y[test_index]
-            #print(train_index)
-            #print(test_index)
-
-
-            poly_trs = PolynomialFeatures(degree=2, interaction_only=False, include_bias=False) #Turn on for poly
-            X_train = poly_trs.fit_transform(X_train) # Turn on for poly
-            X_test = poly_trs.fit_transform(X_test) # Turn on for poly
-            ##################### Model fit
+            #Turn on for poly
+            poly_trs = PolynomialFeatures(degree=2, interaction_only=False, include_bias=False) 
+            X_train = poly_trs.fit_transform(X_train)
+            X_test = poly_trs.fit_transform(X_test)
+            # Turn on for poly
+            ##
             model.fit(X_train, y_train)
             # Metrics on Test set
             confmax_ts[n] = confusion_matrix(y_test, model.predict(X_test))
@@ -310,7 +282,6 @@ def ClassifierK (x, y, model, P): #### Note - Only works for binary classificati
             FNR_ts[n] = FN_ts[n]/(TP_ts[n]+FN_ts[n])
             FPR_ts[n] = FP_ts[n]/(FP_ts[n]+TN_ts[n])
             prfs_array_ts[n, :, :] = precision_recall_fscore_support(y_test, model.predict(X_test))
-
             # Metrics on Train set
             confmax_tr[n] = confusion_matrix(y_train, model.predict(X_train))
             accr_tr[n] = accuracy_score(y_train, model.predict(X_train))
@@ -324,7 +295,6 @@ def ClassifierK (x, y, model, P): #### Note - Only works for binary classificati
             FPR_tr[n] = FP_tr[n]/(FP_tr[n]+TN_tr[n])
             prfs_array_tr[n, :, :] = precision_recall_fscore_support(y_train, model.predict(X_train))
             n += 1
-
         # #
         confmax_tr_p_iteration[p] = confmax_tr.mean(axis=0)
         TPR_tr_p_iteration[p] = TPR_tr.mean()
@@ -339,7 +309,6 @@ def ClassifierK (x, y, model, P): #### Note - Only works for binary classificati
         FPR_ts_p_iteration[p] = FPR_ts.mean()
         FNR_ts_p_iteration[p] = FNR_ts.mean()
         prfs_array_ts_p_iteration[p] = prfs_array_ts.mean(axis=0)
-
     print('#### train results of all  p iteration ###############################################')
     print('mean of TPR train: ', np.mean(TPR_tr_p_iteration, axis=0))
     print('mean of TNR train: ', np.mean(TNR_tr_p_iteration, axis=0))
@@ -347,7 +316,6 @@ def ClassifierK (x, y, model, P): #### Note - Only works for binary classificati
     print('mean of FPR train: ', np.mean(FPR_tr_p_iteration, axis=0))
     print('Train left clmn is cls 0, right clmn cls1, '
           'rows are pression, recal, f1-score, support', np.mean(prfs_array_tr_p_iteration, axis=0))
-
     print('#### test results of all  p iteration ###############################################')
     print('mean of TPR test: ', np.mean(TPR_ts_p_iteration, axis=0))
     print('mean of TNR test: ', np.mean(TNR_ts_p_iteration, axis=0))
@@ -359,29 +327,12 @@ def ClassifierK (x, y, model, P): #### Note - Only works for binary classificati
     TNR_test = np.mean(TNR_ts_p_iteration, axis=0)
     FNR_test = np.mean(FNR_ts_p_iteration, axis=0)
     FPR_test = np.mean(FPR_ts_p_iteration, axis=0)
-    #
-    #
+    ##
     TPR_train = np.mean(TPR_tr_p_iteration, axis=0)
     TNR_train = np.mean(TNR_tr_p_iteration, axis=0)
     FNR_train = np.mean(FNR_tr_p_iteration, axis=0)
     FPR_train = np.mean(FPR_tr_p_iteration, axis=0)
-    
-    ###############LMP Addition
-    logisticRegr = LogisticRegression()
-    logisticRegr.fit(X_train, y_train)
-    predictions = logisticRegr.predict(X_test)
-    score = logisticRegr.score(X_test, y_test)
-    print('LMP SCORE: ',score)
-    
-    RidgeClass = RidgeClassifier()
-    RidgeClass.fit(X_train, y_train)
-    predictions = RidgeClass.predict(X_test)
-    score = RidgeClass.score(X_test, y_test)
-    print('RC SCORE: ',score)        
-        
-    ##############End LMP Addition
-
-
+    ##
     return TPR_test, TNR_test, FNR_test, FPR_test, TPR_train, TNR_train, FNR_train, FPR_train
     # return
 
@@ -444,7 +395,37 @@ col_names = ['TPR_test','TNR_test','FNR_test','FPR_test',
 pdd = pd.DataFrame(Test_and_train_opt_loop_metric, columns=col_names).to_excel('Test_and_train_opt_loop_metric_RC_LMP_235_test.xlsx')
 os.startfile('Test_and_train_opt_loop_metric_RC_LMP_235_test.xlsx')
 
-############################# Hyperparameter Tunning Ridge C regression   ############################# 
+############################# Hyperparameter Tunning Kernel Logistic regression   ############################# 
+
+d_w = 0.1
+w_uplim = 5.001
+w_lolim = 0.001
+
+d_C = 0.1
+C_uplim = 3.001
+C_lolim = 0.001
+
+
+Test_and_train_opt_loop_metric = np.zeros(((mt.ceil((w_uplim-w_lolim)/d_w)*mt.ceil((C_uplim-C_lolim)/d_C)), 10))
+
+for j in range(mt.ceil((w_uplim-w_lolim)/d_w)):
+    for i in range(mt.ceil((C_uplim-C_lolim)/d_C)):
+        Alpha = C_lolim + i*d_C
+        w = w_lolim + j*d_w
+        weg = {0: 1, 1: w} ## Note for L_126, weg = {0: 1, 1: w}. For L_1 weg = {0: w, 1: 1}
+        m = i + j *(mt.ceil((C_uplim-C_lolim)/d_C))
+        Test_and_train_opt_loop_metric[m, 0:8] = ClassifierK(ec_x_scl,ec_235, LogisticRegression(ca=Alpha, class_weight=weg),1)
+        Test_and_train_opt_loop_metric[m, -2] = Alpha
+        Test_and_train_opt_loop_metric[m, -1] = w
+
+col_names = ['TPR_test','TNR_test','FNR_test','FPR_test', 
+'TPR_train', 'TNR_train', 'FnR_train', 'FpR_train', 
+'param_1', 'param2']
+pdd = pd.DataFrame(Test_and_train_opt_loop_metric, columns=col_names).to_excel('Test_and_train_opt_loop_metric_KRC_LMP_235.xlsx')
+os.startfile('Test_and_train_opt_loop_metric_KRC_LMP_235.xlsx')
+
+
+############################# Hyperparameter Tunning Kernel Ridge regression   ############################# 
 
 d_w = 0.1
 w_uplim = 5.001
@@ -508,4 +489,22 @@ os.startfile('Test_and_train_opt_loop_metric_SVM_LMP_235.xlsx')
 #LP Add sound so I know when to pay attention
 winsound.Beep(340, 200)
 
+
+#######################Work in Progress
+
+
+    
+###############LMP Addition
+logisticRegr = LogisticRegression()
+logisticRegr.fit(X_train, y_train)
+predictions = logisticRegr.predict(X_test)
+score = logisticRegr.score(X_test, y_test)
+print('LR SCORE: ',score)
+    
+RidgeClass = RidgeClassifier()
+RidgeClass.fit(X_train, y_train)
+predictions = RidgeClass.predict(X_test)
+score = RidgeClass.score(X_test, y_test)
+print('RC SCORE: ',score)        
+#############End LMP Addition
 
