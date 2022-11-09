@@ -339,12 +339,12 @@ def KClassifier (x, y, model, P): #### Note - Only works for binary classificati
 
 
 ############################# Hyperparameter Tunning for Log regression ############################# 
-d_w = 0.1
-w_uplim = 1.001
+d_w = 1
+w_uplim = 3
 w_lolim = 0.001
 
-d_C = 0.1
-C_uplim = 1.001
+d_C = 0.01
+C_uplim = 1
 C_lolim = 0.001
 
 
@@ -363,8 +363,8 @@ for j in range(mt.ceil((w_uplim-w_lolim)/d_w)):
 col_names = ['TPR_test','TNR_test','FNR_test','FPR_test', 
 'TPR_train', 'TNR_train', 'FnR_train', 'FpR_train', 
 'param_1', 'param2']
-pdd = pd.DataFrame(Test_and_train_opt_loop_metric, columns=col_names).to_excel('Test_and_train_opt_loop_metric_LR_LMP_235_test.xlsx')
-os.startfile('Test_and_train_opt_loop_metric_LR_LMP_235_test.xlsx')
+pdd = pd.DataFrame(Test_and_train_opt_loop_metric, columns=col_names).to_excel('Test_and_train_opt_loop_metric_LR_LMP_235_testymctestface3.xlsx')
+os.startfile('Test_and_train_opt_loop_metric_LR_LMP_235_testymctestface3.xlsx')
 
 #############################  Hyperparameter Tunning Ridge regression   ############################# 
 ### THIS OE WORKED!!!
@@ -456,13 +456,16 @@ os.startfile('Test_and_train_opt_loop_metric_KRC_LMP_235.xlsx')
 
 
 #############################  Hyperparameter Tunning for SVM ############################# 
+import warnings
+
+warnings.filterwarnings('ignore')
 d_C = 0.1
-C_uplim = 11.001
-C_lolim = 10.001
+C_uplim = 100
+C_lolim = 90.001
 #
 d_gamm = 0.1
-gamm_uplim = 11.001
-gamm_lolim = 10.001
+gamm_uplim = 39
+gamm_lolim = 35.001
 #
 Test_and_train_opt_loop_metric = np.zeros(((mt.ceil((gamm_uplim-gamm_lolim)/d_gamm)*mt.ceil((C_uplim-C_lolim)/d_C)), 10))
 #
@@ -481,8 +484,8 @@ for j in range(mt.ceil((gamm_uplim-gamm_lolim)/d_gamm)):
 #
 #
 col_names = ['TPR_test','TNR_test','FNR_test','FPR_test', 'TPR_train', 'TNR_train', 'FPR_train', 'FNR_train', 'param_3', 'param2']
-pdd = pd.DataFrame(Test_and_train_opt_loop_metric, columns=col_names).to_excel('Test_and_train_opt_loop_metric_SVM_LMP_235.xlsx')
-os.startfile('Test_and_train_opt_loop_metric_SVM_LMP_235.xlsx')
+pdd = pd.DataFrame(Test_and_train_opt_loop_metric, columns=col_names).to_excel('Test_and_train_opt_loop_metric_SVM_LMP_235_test2.xlsx')
+os.startfile('Test_and_train_opt_loop_metric_SVM_LMP_235_test2.xlsx')
 # #
 
 ############################# Add sound ############################# 

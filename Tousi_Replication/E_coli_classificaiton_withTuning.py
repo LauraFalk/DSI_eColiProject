@@ -69,6 +69,9 @@ from sklearn.feature_selection import SelectKBest
 from sklearn.feature_selection import f_classif
 from sklearn.metrics import precision_score, recall_score, roc_curve
 
+# LP addition
+import time
+time.sleep(10)
 
 inp = pd.read_excel(os.path.join(os.getcwd(),'Tousi_Replication/Input_76_data point.xlsx'))
 input_data = pd.DataFrame(inp)
@@ -415,9 +418,11 @@ def Classifier (x, y, model, P): #### Note this Clssider only works for binary c
             # pd.DataFrame(np.concatenate((train_index,test_index))).to_excel(f'fold:{b}.xlsx')         # ################### Ploynominal Kernel
             # os.startfile(f'fold: {b}.xlsx')
             # b += 1
+            # LP - Turn on following three rows for kernels.
             #poly_trs = PolynomialFeatures(degree=2, interaction_only=False, include_bias=False)
             #X_train = poly_trs.fit_transform(X_train)
             #X_test = poly_trs.fit_transform(X_test)
+            
             # # print(X_train.shape)
             ##################### Model fit
             model.fit(X_train, y_train)
@@ -528,14 +533,15 @@ def Classifier (x, y, model, P): #### Note this Clssider only works for binary c
 
 
 
+
 ################# Hyperparameter Tunning for SVM #############
-d_C = 0.2
-C_uplim = 41
-C_lolim = 35
+d_C = 0.1
+C_uplim = 5
+C_lolim = 0.001
 #
 d_gamm = 0.1
-gamm_uplim = 5
-gamm_lolim = 1
+gamm_uplim = 8
+gamm_lolim = 0.001
 #
 Test_and_train_opt_loop_metric = np.zeros(((mt.ceil((gamm_uplim-gamm_lolim)/d_gamm)*mt.ceil((C_uplim-C_lolim)/d_C)), 10))
 #
@@ -544,7 +550,7 @@ for j in range(mt.ceil((gamm_uplim-gamm_lolim)/d_gamm)):
         C = C_lolim + i*d_C
         gamm = gamm_lolim + j*d_gamm
         m = i + j *(mt.ceil((C_uplim-C_lolim)/d_C))
-        Test_and_train_opt_loop_metric[m, 0:8] = Classifier(X_Ec_scl_1, y_Ec_label_1, SVC(kernel='rbf', C=C, gamma=gamm, class_weight='balanced'),1)
+        Test_and_train_opt_loop_metric[m, 0:8] = Classifier(X_Ec_scl_126, y_Ec_label_126, SVC(kernel='rbf', C=C, gamma=gamm, class_weight='balanced'),1)
         Test_and_train_opt_loop_metric[m, -2] = C
         Test_and_train_opt_loop_metric[m, -1] = gamm
 #
@@ -554,8 +560,8 @@ for j in range(mt.ceil((gamm_uplim-gamm_lolim)/d_gamm)):
 #
 #
 col_names = ['TPR_test','TNR_test','FNR_test','FPR_test', 'TPR_train', 'TNR_train', 'FPR_train', 'FNR_train', 'param_3', 'param2']
-pdd = pd.DataFrame(Test_and_train_opt_loop_metric, columns=col_names).to_excel('Tousi_Replication/Tuning_Outputs/Test_and_train_opt_loop_metric_SVM_FES_1.xlsx')
-os.startfile('Tousi_Replication/Tuning_Outputs/Test_and_train_opt_loop_metric_SVM_FES_1.xlsx')
+pdd = pd.DataFrame(Test_and_train_opt_loop_metric, columns=col_names).to_excel('Tousi_Replication\\Tuning_Outputs\\Test_and_train_opt_loop_metric_SVM_FES_126.xlsx')
+os.startfile('Tousi_Replication\\Tuning_Outputs\\Test_and_train_opt_loop_metric_SVM_FES_126.xlsx')
 # #
 
 import winsound
@@ -565,14 +571,13 @@ winsound.Beep(freq, duration)
 
 ################## Hyperparameter Tunning for Log and Ridge regression   #############
 
-d_w = 0.1
-w_uplim = 3.501
-w_lolim = 0.001
-
 d_C = 0.1
-C_uplim = 52
-C_lolim = 48.001
+C_uplim = 8
+C_lolim = 0.001
 
+d_w = 0.1
+w_uplim = 17
+w_lolim = 5
 
 Test_and_train_opt_loop_metric = np.zeros(((mt.ceil((w_uplim-w_lolim)/d_w)*mt.ceil((C_uplim-C_lolim)/d_C)), 10))
 
@@ -580,21 +585,19 @@ for j in range(mt.ceil((w_uplim-w_lolim)/d_w)):
     for i in range(mt.ceil((C_uplim-C_lolim)/d_C)):
         C = C_lolim + i*d_C
         w = w_lolim + j*d_w
-        weg = {0: w, 1: 1} ## Note for L_126, weg = {0: 1, 1: w}. For L_1 weg = {0: w, 1: 1}
+        weg = {0: 1, 1: w} ## Note for L_126, weg = {0: 1, 1: w}. For L_1 weg = {0: w, 1: 1}
         m = i + j *(mt.ceil((C_uplim-C_lolim)/d_C))
-        Test_and_train_opt_loop_metric[m, 0:8] = Classifier(X_Ec_scl_1_sc,y_Ec_label_1, RidgeClassifier(alpha=C, class_weight=weg),1)
+        Test_and_train_opt_loop_metric[m, 0:8] = Classifier(X_Ec_scl_126,y_Ec_label_126, RidgeClassifier(alpha=C, class_weight=weg),1)
         Test_and_train_opt_loop_metric[m, -2] = C
         Test_and_train_opt_loop_metric[m, -1] = w
 
         # print('C:', C)
     # print('w:', w)
 
-
-
-
-col_names = ['TPR_test','TNR_test','FNR_test','FPR_test', 'TPR_train', 'TNR_train', 'FnR_train', 'FpR_train', 'param_1', 'param2']
-pdd = pd.DataFrame(Test_and_train_opt_loop_metric, columns=col_names).to_excel('Tousi_Replication/Tuning_Outputs/Test_and_train_opt_loop_metric_KRC_FIS_1.xlsx')
-os.startfile('Tousi_Replication/Tuning_Outputs/Test_and_train_opt_loop_metric_KRC_FIS_1.xlsx')
+col_names = ['TPR_test','TNR_test','FNR_test','FPR_test', 'TPR_train', 'TNR_train', 'FPR_train', 'FNR_train', 'param_3', 'param2']
+pdd = pd.DataFrame(Test_and_train_opt_loop_metric, columns=col_names).to_excel('Tousi_Replication\\Tuning_Outputs\\Test_and_train_opt_loop_metric_LR_FES_126.xlsx')
+os.startfile('Tousi_Replication\\Tuning_Outputs\\Test_and_train_opt_loop_metric_LR_FES_126.xlsx')
+# 
 
 # Added this so I know when to pay attention
 import winsound

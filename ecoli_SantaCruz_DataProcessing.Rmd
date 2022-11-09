@@ -85,7 +85,7 @@ USGS_Standardized <- USGS_Standardized %>%
 USGS_Standardized %>% group_by(DateTime2) %>% summarise(n=sum(n())) %>% filter(n>1)
 
 # Remove append table - data has been merged
-remove(USGS_Standardized_append)
+rm(USGS_Standardized_append)
 
 ```
 
@@ -106,7 +106,7 @@ TimeSeries$DateTime2 <-as.POSIXct(format(TimeSeries$DateTime2, format = '%Y-%m-%
 USGS_Standardized <- merge(x=TimeSeries,y=USGS_Standardized,by="DateTime2",all.x=TRUE, all.y = FALSE)
 
 # Remove the created time series. Data has been merged
-remove(TimeSeries)
+rm(TimeSeries)
 ```
 
 Look at the data to ensure that it is doing what we want. I know that 7/1/2009 at 04:30 has no data.
@@ -147,7 +147,7 @@ USGS_Standardized <- USGS_Standardized %>%
   select(DateTime2, date, Discharge_CFS, USGS_Staff, Discharge_cd, tz_cd, DailyFlowCount)
 
 # Remove Timeflag table. Merged into data
-remove(TimeFlag)
+rm(TimeFlag)
 
 ```
 
@@ -165,7 +165,7 @@ USGS_Standardized_Fill$Filled <-  na.approx(USGS_Standardized_Fill$Discharge_CFS
 USGS_Standardized <- right_join(USGS_Standardized_Fill,USGS_Standardized)
 
 # Remove the old data
-remove(USGS_Standardized_Fill,USGS_Raw)
+rm(USGS_Standardized_Fill,USGS_Raw)
 
 ```
 
@@ -209,7 +209,7 @@ USGS_Standardized$Stage <- ifelse(USGS_Standardized$Discharge_CFS<=CFS_Quantiles
   ifelse(USGS_Standardized$Discharge_CFS > CFS_Quantiles[4] & USGS_Standardized$DisDif2 == 0,4, NA))))
 
 # Remove fields with variables used for calculations
-remove(CFS_Quantiles)
+rm(CFS_Quantiles)
 
 ```
 
@@ -299,7 +299,7 @@ ecoli_data <- rbind(RawStoret_data, RawSODN_data)
 ecoli_data<- remove_empty(ecoli_data, c("cols"))
 
 # Remove the pre-merged raw data
-remove(RawStoret_data, RawSODN_data)
+rm(RawStoret_data, RawSODN_data)
 ```
 
 
@@ -345,7 +345,7 @@ ecoli_data<- merge(ecoli_data, Locations, by = c("MonitoringLocationIdentifier")
 
 Remove unnecessary tables. 
 ```{r}
-remove(Locations, RawLocation, RawSODN, RawStoret)
+rm(Locations, RawLocation, RawSODN, RawStoret)
 ```
 
 Remove any null columns created by reducing the dataset size.
@@ -480,7 +480,7 @@ data_Merge %>%
 
 Remove raw data, now merged
 ```{r}
-remove(USGS_Standardized, ecoli_data)
+rm(USGS_Standardized, ecoli_data)
 ```
 
 
@@ -550,7 +550,7 @@ DailyClimate <- read.csv(Rawclimate, skip = 3)
 DailyClimate <- head(DailyClimate, - 1)
 
 # Variable no longer needed.
-remove(Rawclimate)
+rm(Rawclimate)
 ```
 
 What about the sum of previous three-days precipitation
@@ -720,7 +720,7 @@ data_Merge3 <- data_Merge2 %>%
   select(ActivityConductingOrganizationText, MonitoringLocationIdentifier, QuantificationLimit, DailyFlowCount, DateTime2, StandardizedResult, Discharge_CFS, USGS_Staff, QuantificationLimit, Precipitation..in., PreviousTmax, PreviousTmin, Previous3Precip, Previous7Precip, Previous30Precip, Season, NinXTS, TOD, Stage, DistFromSonoita)
 
 # Remove old data.
-remove(data_Merge, data_Merge2, DailyClimate, Nin, NinXTS)
+rm(data_Merge, data_Merge2, DailyClimate, Nin, NinXTS)
 ```
 
 
@@ -882,6 +882,6 @@ Season and temperature are also extremely strongly correlated. It may make sense
 # Export data for analysis in python.
 ```{r}
 write.csv(data_Merge3 %>%
-            select("Previous30Precip", "Discharge_CFS", "Stage","NinXTS", "TOD","ACO_Numeric", "DistFromSonoita","ecoli_235", "ecoli_575" ), "Data/Processed/ecoli_attributed.csv")
+            select("Previous30Precip", "Discharge_CFS", "Stage","NinXTS", "TOD", "DistFromSonoita","ecoli_235", "ecoli_575" ), "Data/Processed/ecoli_attributed2.csv")
 ```
 
