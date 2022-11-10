@@ -1,5 +1,6 @@
 library(caret)
 library(xgboost)
+library(stackgbm)
 ecoli_attr <- read.csv("Data/Processed/ecoli_attributed.csv")
 
 ecoli_235 <- ecoli_attr[,2:9]
@@ -119,6 +120,7 @@ train <- ecoli_235[parts, ]
 test<-ecoli_235[-parts, ]
 
 # What if I take previous30 precip out of the equation
+train_matrix <- data.matrix(train)
 
 train_x <- data.matrix(train[, 2:7])
 train_y <- train[,8]
@@ -138,3 +140,19 @@ finalmodel <- xgboost(data = xgb_train, max.depth = 3, nrounds = 60, verbose = 0
 pred <- predict(finalmodel, as.matrix(test_x))
 pred <-  as.numeric(pred > 0.45)
 confusionMatrix(factor(pred),factor(test_y))
+
+
+##############################
+library(tidyverse)
+folds = createFolds(train_x, k = 10)
+cv <- lapply(folds, function(x) {
+  # we stick our XGBoost classifier in here
+  classifier = xgboost(data = as.matrix(train_x), label = train_y, nrounds = 10)
+  y_pred = predict(classifier, newdata = as.matrix(test_x)) # again need a matrix
+  y_pred = (y_pred >= 0.5) # here we are setting up the binary outcome of 0 or 1
+  cm = table(test_y, y_pred)
+  accuracy = (cm[1,1] + cm[2,2]) / (cm[1,1] + cm[2,2] + cm[1,2] + cm[2,1])
+  return(accuracy)
+})
+accuracy = mean(as.numeric(cv))
+print(accuracy)
