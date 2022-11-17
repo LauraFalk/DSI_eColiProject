@@ -11,6 +11,7 @@ library(dataRetrieval)
 library(janitor)
 library(knitr)
 library(lubridate)
+library(slider)
 library(tidyverse)
 library(xts)
 library(zoo)
@@ -565,7 +566,7 @@ DailyClimate$Previous30Precip <-  lag(rollsumr(DailyClimate$Precipitation..in., 
 Lag Tmax an Tmin
 ```{r}
 # Use the previous day's Tmin due to data posting interval. This may be used for future forecasting.
-DailyClimate$PreviousTmin <- lag(DailyClimate$Tmin..F.)
+DailyClimate$PreviousTmin <- lag(DailyClimate$Tmin..F.,2)
 # Use the previous day's Tmin due to data posting interval. This may be used for future forecasting.
 DailyClimate$PreviousTmax <- lag(DailyClimate$Tmax..F.)
 
@@ -638,6 +639,58 @@ data_Merge2 %>%
   geom_hline(yintercept=575, linetype="dashed", 
                 color = "dark green", size=0.2)
 ```
+This creates a rolling minimum value at different intervals. As precipitation data is currently questionable, I would like to shift to using minimum temperature instead (11/4/2022). According to correlation plots run previously, tMin is nearly as correlated as previous 30 precip.
+
+```{r}
+myMin <- function(x) ifelse( !all(is.na(x)), min(x, na.rm=T), NA)
+
+data_Merge2 <- data_Merge2 %>%
+  mutate(ThreeDayMin = slide_dbl(Tmin..F., myMin, .before = 2, .complete = FALSE))
+
+data_Merge2 <- data_Merge2 %>%
+  mutate(TenDayMin = slide_dbl(Tmin..F., myMin, .before = 9, .complete = TRUE))
+
+data_Merge2 <- data_Merge2 %>%
+  mutate(ThirtyDayMin = slide_dbl(Tmin..F., myMin, .before = 29, .complete = TRUE))
+
+```
+
+```{r}
+data_Merge2 %>%
+  filter(!is.nan(ThreeDayMin)) %>%
+  ggplot(aes(x=ThreeDayMin, y=StandardizedResult)) +
+  geom_point() +
+  geom_hline(yintercept=126, linetype="dashed", 
+                color = "blue", size=0.2) +
+  geom_hline(yintercept=235, linetype="dashed", 
+                color = "red", size=0.2)+
+  geom_hline(yintercept=575, linetype="dashed", 
+                color = "dark green", size=0.2)
+
+data_Merge2 %>%
+  filter(!is.nan(TenDayMin)) %>%
+  ggplot(aes(x=TenDayMin, y=StandardizedResult)) +
+  geom_point() +
+  geom_hline(yintercept=126, linetype="dashed", 
+                color = "blue", size=0.2) +
+  geom_hline(yintercept=235, linetype="dashed", 
+                color = "red", size=0.2)+
+  geom_hline(yintercept=575, linetype="dashed", 
+                color = "dark green", size=0.2)
+
+data_Merge2 %>%
+  filter(!is.nan(ThirtyDayMin)) %>%
+  ggplot(aes(x=ThirtyDayMin, y=StandardizedResult)) +
+  geom_point() +
+  geom_hline(yintercept=126, linetype="dashed", 
+                color = "blue", size=0.2) +
+  geom_hline(yintercept=235, linetype="dashed", 
+                color = "red", size=0.2)+
+  geom_hline(yintercept=575, linetype="dashed", 
+                color = "dark green", size=0.2)
+```
+
+
 Now I want to look at season. According to the NPS protocol the seasons in southern Arizona are:
 Fall (October 1 - December 30)
 Winter (January 1 - March 30)
@@ -717,7 +770,7 @@ data_Merge2$TOD <- c(4, 1, 2, 3, 4)[as.numeric(data_Merge2$TOD)]
 
 # Columns are organized so that the "metadata" columns are in the beginning. These will not be used for correlation views.
 data_Merge3 <- data_Merge2 %>%
-  select(ActivityConductingOrganizationText, MonitoringLocationIdentifier, QuantificationLimit, DailyFlowCount, DateTime2, StandardizedResult, Discharge_CFS, USGS_Staff, QuantificationLimit, Precipitation..in., PreviousTmax, PreviousTmin, Previous3Precip, Previous7Precip, Previous30Precip, Season, NinXTS, TOD, Stage, DistFromSonoita)
+  select(ActivityConductingOrganizationText, MonitoringLocationIdentifier, QuantificationLimit, DailyFlowCount, DateTime2, StandardizedResult, Discharge_CFS, USGS_Staff, QuantificationLimit, Precipitation..in., PreviousTmax, PreviousTmin, Previous3Precip, ThreeDayMin, TenDayMin, ThirtyDayMin, Previous7Precip, Previous30Precip, Season, NinXTS, TOD, Stage, DistFromSonoita)
 
 # Remove old data.
 rm(data_Merge, data_Merge2, DailyClimate, Nin, NinXTS)
@@ -838,7 +891,7 @@ Use the *Training* data to train the models. Test data comes in for validation p
 ```{r}
 # Ensure that only numeric data is contained. There was a previous cleanup but it still contained metadata.
 traindata_numeric <- traindata %>%
-  select(c("StandardizedResult", "ecoli_235","ecoli_575", "Discharge_CFS", "USGS_Staff", "Precipitation..in.", "PreviousTmax", "PreviousTmin", "Previous3Precip", "Previous7Precip", "Previous30Precip", "NinXTS", "TOD", "Stage", "SeasonNumeric", "ACO_Numeric", "DistFromSonoita"))
+  select(c("StandardizedResult", "ecoli_235","ecoli_575", "Discharge_CFS", "USGS_Staff", "Precipitation..in.", "PreviousTmax", "PreviousTmin", "Previous3Precip", "Previous7Precip", "Previous30Precip", "NinXTS", "TOD", "Stage", "SeasonNumeric", "ACO_Numeric", "DistFromSonoita", "ThreeDayMin", "TenDayMin", "ThirtyDayMin"))
 
 # I can look at pairs
 # Now that I've added more variables this isn't exactly useful.
@@ -856,14 +909,14 @@ corrplot(cor, method = 'square', order = 'FPC', type = 'upper', diag = FALSE, ad
 ```{r}
 # looking at only ecoli_575
 cor2 <- cor(traindata %>%
-  select(c("ecoli_575", "Previous30Precip", "PreviousTmin", "Discharge_CFS", "Stage","NinXTS", "TOD","ACO_Numeric", "DistFromSonoita")))
+  select(c("ecoli_575", "Previous30Precip", "PreviousTmin", "Discharge_CFS", "Stage","NinXTS", "TOD","ACO_Numeric", "DistFromSonoita","ThreeDayMin", "TenDayMin", "ThirtyDayMin")))
 
 corrplot(cor2, method = 'square', order = 'FPC', type = 'upper', diag = FALSE, addCoef.col="black", number.cex=0.75)
 ```
 ```{r}
 # looking at only ecoli_235
 cor3<- cor(traindata %>%
-  select(c("ecoli_235", "Previous30Precip", "PreviousTmin", "Discharge_CFS", "Stage","NinXTS", "TOD","ACO_Numeric", "DistFromSonoita")))
+  select(c("ecoli_235", "Previous30Precip", "PreviousTmin", "Discharge_CFS", "Stage","NinXTS", "TOD","ACO_Numeric", "DistFromSonoita","ThreeDayMin", "TenDayMin", "ThirtyDayMin")))
 
 corrplot(cor3, method = 'square', order = 'FPC', type = 'upper', diag = FALSE, addCoef.col="black", number.cex=0.75)
 ```
@@ -882,6 +935,6 @@ Season and temperature are also extremely strongly correlated. It may make sense
 # Export data for analysis in python.
 ```{r}
 write.csv(data_Merge3 %>%
-            select("Previous30Precip", "Discharge_CFS", "Stage","NinXTS", "TOD", "DistFromSonoita","ecoli_235", "ecoli_575" ), "Data/Processed/ecoli_attributed2.csv")
+            select("PreviousTmin", "Discharge_CFS", "Stage","NinXTS", "TOD", "DistFromSonoita","ecoli_235", "ecoli_575" ), "Data/Processed/ecoli_attributed2.csv")
 ```
 

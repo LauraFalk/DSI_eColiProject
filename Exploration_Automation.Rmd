@@ -1,0 +1,105 @@
+---
+title: "Automation Processing"
+author: "Laura Palacios"
+date: '2022-11-13'
+output: html_document
+---
+# Libraries
+```{r setup, include=FALSE}
+library(dataRetrieval)
+library(knitr)
+library(tidyverse)
+
+# Not currently on CRAN - devtools::install_github("scoyoc/climateAnalyzeR")
+library(climateAnalyzeR)
+
+opts_chunk$set(echo = TRUE)
+```
+
+# Read in the data
+
+I will need to read in:
+
+1. Previous30Precip (Climateanalyzer - Calculated value)
+2. Discharge_CFS (USGS WaterData - Raw)
+3. Stage (USGS Waterdata - Calculated Categorical
+4. NinXTS (NOAA?)
+5. TOD (Use Current?)
+6. DistFromSonoita (Think about this one. Can I calc using latlong?) https://stackoverflow.com/questions/32363998/function-to-calculate-geospatial-distance-between-two-points-lat-long-using-r
+
+# 1 - Previous 30 days of precipitation
+LAURA - this should get changed to previous min. How can these values be merged
+min in the week
+average week
+average month
+
+```{r}
+# Find start and end dates to use for data pulls
+startDate <- Sys.Date() - 31
+endDate <- Sys.Date() - 1
+startYear <- as.numeric(format(Sys.Date(), "%Y"))-1
+endYear <- as.numeric(format(Sys.Date(), "%Y"))
+tz="America/Phoenix"
+```
+
+# Laura i need to lag this one more time in the processing due to the outputs of climate analyzer. sigh.
+Rain gage data is not trustworthy. Remind Bri to check for crickets.
+```{r}
+# Pulls in current and 1 previous year's data (to account for January calcs)
+TMin <- climateAnalyzeR::import_data("daily_wx", station_id = 'KA7WSB-1', start_year = startYear, end_year = endYear, station_type = 'RAWS')
+
+TMin$DateasDate <- as.POSIXct(TMin$date, format = "%m/%d/%Y", tz = tz)
+
+
+Var_TMin <- TMin %>%
+  subset(DateasDate == endDate - 2) %>%
+  select(tmin_f)
+
+Var_TMin <- as.numeric(unlist(Var_TMin))
+
+rm(TMin)
+```
+
+# Discharge data
+
+Use dataRetrieval to pull in the data from the USGS waterdata website.
+```{r}
+# Inputs formatted for read NWIS function.
+site_id <- '09481740'
+
+# Input timezone for read NWIS and POSIXT functions
+tz="America/Phoenix" 
+
+# Creates table in R
+USGSRaw <- readNWISuv(site_id,c('00060','00065'), startDate,endDate, tz)
+
+Var_Discharge_CFS<- tail(USGSRaw$X_00060_00000, n=1)
+
+rm(USGSRaw)
+
+```
+
+# Stage
+
+## Laura thsi does not work 
+```{r}
+CFS_Quantiles<- quantile(USGSRaw$Discharge_CFS, na.rm = TRUE)
+
+USGSRaw <- USGSRaw %>% 
+  mutate(DisDif = Discharge_CFS - lag(Discharge_CFS))
+
+# This will create a binary variable or either rise of fall. Rise = 1, fall = 0. It will allow me to more easily create summary statistics.
+USGSRaw$DisDif2 <- ifelse(USGSRaw$DisDif>0,1,0)
+
+# Create a numeric classifier. 
+# 1 = Low Flow, 2 = Base flow, 3 = High and Rising Flow 4 = High and Falling Flow
+USGSRaw$Stage <- ifelse(USGSRaw$X_00060_00000 <=CFS_Quantiles[2], 1, 
+  ifelse(USGSRaw$X_00060_00000 > CFS_Quantiles[2] & USGSRaw$X_00060_00000 <= CFS_Quantiles[4],2,
+  ifelse(USGSRaw$X_00060_00000 > CFS_Quantiles[4] & USGSRaw$DisDif2 == 1,3,
+  ifelse(USGSRaw$X_00060_00000 > CFS_Quantiles[4] & USGSRaw$DisDif2 == 0,4, NA))))
+
+# Remove fields with variables used for calculations
+rm(CFS_Quantiles)
+
+```
+
