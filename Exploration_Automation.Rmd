@@ -51,6 +51,7 @@ TMin <- climateAnalyzeR::import_data("daily_wx", station_id = 'KA7WSB-1', start_
 TMin$DateasDate <- as.POSIXct(TMin$date, format = "%m/%d/%Y", tz = tz)
 
 
+<<<<<<< HEAD
 Var_TMin <- TMin %>%
   subset(DateasDate == endDate - 2) %>%
   select(tmin_f)
@@ -60,6 +61,25 @@ Var_TMin <- as.numeric(unlist(Var_TMin))
 rm(TMin)
 ```
 
+=======
+TMinVar <- TMin %>%
+  subset(DateasDate == endDate - 1) %>%
+  select(tmin_f)
+  
+```
+
+```{r}
+
+
+# ensure that date field is *actually* a date field. 
+PrecipRaw$dateFormatted <- lubridate::mdy(PrecipRaw$date)
+
+
+PrecipRaw %>%
+  filter(dateFormatted >= startDate & dateFormatted <= endDate) %>%
+  summarise(Previous30Precip = sum(prcp_in))
+```
+>>>>>>> dc4a5a9d8d115615e3ddbe42838671efde91fbcc
 # Discharge data
 
 Use dataRetrieval to pull in the data from the USGS waterdata website.
@@ -73,10 +93,14 @@ tz="America/Phoenix"
 # Creates table in R
 USGSRaw <- readNWISuv(site_id,c('00060','00065'), startDate,endDate, tz)
 
+<<<<<<< HEAD
 Var_Discharge_CFS<- tail(USGSRaw$X_00060_00000, n=1)
 
 rm(USGSRaw)
 
+=======
+Discharge_CFS <- tail(USGSRaw$X_00060_00000, n=1)
+>>>>>>> dc4a5a9d8d115615e3ddbe42838671efde91fbcc
 ```
 
 # Stage
