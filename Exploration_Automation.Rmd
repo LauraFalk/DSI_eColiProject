@@ -20,18 +20,14 @@ opts_chunk$set(echo = TRUE)
 
 I will need to read in:
 
-1. Previous30Precip (Climateanalyzer - Calculated value)
-2. Discharge_CFS (USGS WaterData - Raw)
+1. PreviousTmin(Climateanalyzer - lagged raw value)
+2. Discharge_CFS (USGS WaterData - Raw value)
 3. Stage (USGS Waterdata - Calculated Categorical
 4. NinXTS (NOAA?)
 5. TOD (Use Current?)
 6. DistFromSonoita (Think about this one. Can I calc using latlong?) https://stackoverflow.com/questions/32363998/function-to-calculate-geospatial-distance-between-two-points-lat-long-using-r
 
-# 1 - Previous 30 days of precipitation
-LAURA - this should get changed to previous min. How can these values be merged
-min in the week
-average week
-average month
+# Default values for data pulls - only need to do this once
 
 ```{r}
 # Find start and end dates to use for data pulls
@@ -42,8 +38,8 @@ endYear <- as.numeric(format(Sys.Date(), "%Y"))
 tz="America/Phoenix"
 ```
 
-# Laura i need to lag this one more time in the processing due to the outputs of climate analyzer. sigh.
-Rain gage data is not trustworthy. Remind Bri to check for crickets.
+# 1 - Previous T min (2 days prior). I need to lag this one more time in the processing due to the outputs of climate analyzer. This was previously used as the 30 day precipitation values, but the rain gage data is not trustworthy anymore due to birds and mowing vehicles.
+
 ```{r}
 # Pulls in current and 1 previous year's data (to account for January calcs)
 TMin <- climateAnalyzeR::import_data("daily_wx", station_id = 'KA7WSB-1', start_year = startYear, end_year = endYear, station_type = 'RAWS')
@@ -51,7 +47,6 @@ TMin <- climateAnalyzeR::import_data("daily_wx", station_id = 'KA7WSB-1', start_
 TMin$DateasDate <- as.POSIXct(TMin$date, format = "%m/%d/%Y", tz = tz)
 
 
-<<<<<<< HEAD
 Var_TMin <- TMin %>%
   subset(DateasDate == endDate - 2) %>%
   select(tmin_f)
@@ -61,25 +56,6 @@ Var_TMin <- as.numeric(unlist(Var_TMin))
 rm(TMin)
 ```
 
-=======
-TMinVar <- TMin %>%
-  subset(DateasDate == endDate - 1) %>%
-  select(tmin_f)
-  
-```
-
-```{r}
-
-
-# ensure that date field is *actually* a date field. 
-PrecipRaw$dateFormatted <- lubridate::mdy(PrecipRaw$date)
-
-
-PrecipRaw %>%
-  filter(dateFormatted >= startDate & dateFormatted <= endDate) %>%
-  summarise(Previous30Precip = sum(prcp_in))
-```
->>>>>>> dc4a5a9d8d115615e3ddbe42838671efde91fbcc
 # Discharge data
 
 Use dataRetrieval to pull in the data from the USGS waterdata website.
@@ -93,24 +69,19 @@ tz="America/Phoenix"
 # Creates table in R
 USGSRaw <- readNWISuv(site_id,c('00060','00065'), startDate,endDate, tz)
 
-<<<<<<< HEAD
 Var_Discharge_CFS<- tail(USGSRaw$X_00060_00000, n=1)
 
-rm(USGSRaw)
 
-=======
-Discharge_CFS <- tail(USGSRaw$X_00060_00000, n=1)
->>>>>>> dc4a5a9d8d115615e3ddbe42838671efde91fbcc
 ```
 
 # Stage
-
-## Laura thsi does not work 
 ```{r}
-CFS_Quantiles<- quantile(USGSRaw$Discharge_CFS, na.rm = TRUE)
+# Create quantiles for categorization
+CFS_Quantiles<- quantile(USGSRaw$X_00060_00000, na.rm = TRUE)
 
+# Determine the difference between prior reading and current.
 USGSRaw <- USGSRaw %>% 
-  mutate(DisDif = Discharge_CFS - lag(Discharge_CFS))
+  mutate(DisDif = X_00060_00000 - lag(X_00060_00000))
 
 # This will create a binary variable or either rise of fall. Rise = 1, fall = 0. It will allow me to more easily create summary statistics.
 USGSRaw$DisDif2 <- ifelse(USGSRaw$DisDif>0,1,0)
@@ -125,5 +96,62 @@ USGSRaw$Stage <- ifelse(USGSRaw$X_00060_00000 <=CFS_Quantiles[2], 1,
 # Remove fields with variables used for calculations
 rm(CFS_Quantiles)
 
+# Create the stage variable.
+Var_Stage<- tail(USGSRaw$Stage, n=1)
+
+rm(USGSRaw)
+```
+
+4. NinXTS (NOAA?)
+```{r}
+# Bring in the website data
+url <- "https://origin.cpc.ncep.noaa.gov/products/analysis_monitoring/ensostuff/ONI_v5.php"
+NinXTS <- url %>%
+  rvest::read_html()
+
+# Grab the data table
+NinText <- rvest::html_table(rvest::html_nodes(NinXTS, xpath = './/table[4]//table[2]'))
+
+# Convert ONI index to dataframe
+NinTable <- as.data.frame(NinText[1])
+
+# Remove NA data from last row 
+NinXTSRow <- tail(NinTable, n = 1) %>%
+  select_if(~ !any(is.na(.)))
+
+# Pull last reported value
+Var_NinXTS <- as.numeric(unlist(NinXTSRow[length(NinXTSRow)]))
+
+rm(NinXTS, NinXTSRow, NinTable, NinText)
+
+```
+
+
+5. TOD (Use Current?)
+
+```{r}
+#modified from https://stackoverflow.com/questions/49370387/convert-time-object-to-categorical-morning-afternoon-evening-night-variable
+
+# Create categorical variables
+currenttime <- as.POSIXct(Sys.time(), format = "%H:%M") %>% format("%H:%M:%S")
+
+currenttime <- cut(chron::times(currenttime) , breaks = (1/24) * c(0,5,11,16,19,24))
+Var_TOD <- c(4, 1, 2, 3, 4)[as.numeric(currenttime)]
+
+```
+
+6. DistFromSonoita (Think about this one. Can I calc using latlong?) Just use a lookup?
+
+```{r}
+library(mapview)
+library(sf)
+samplelocs <- read.csv("Data/Raw/ecoli_Locations_StoretandSODN.csv")
+
+samplelocs <- samplelocs %>%
+  select(c('OrganizationIdentifier', 'MonitoringLocationIdentifier', 'MonitoringLocationName', 'LatitudeMeasure', 'LongitudeMeasure'))
+
+spatiallocs <- read_sf("Data/Processed/ecoli_Locations_StoretandSODN_XYtableToPoint1.shp")
+
+mapview(samplelocs, xcol = "LatitudeMeasure", ycol = "LongituddeMeasure", zcol = "MonitoringLocationIdentifier")
 ```
 

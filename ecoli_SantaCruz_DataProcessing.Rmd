@@ -458,7 +458,7 @@ ecoli_data<- ecoli_data %>%
 ## Combine the ecoli, USGS, and environmental variable data.
 USGS - discharge and stage data
 ClimateAnalyzer (ClimateAnalyzer.org) - Tmax, Tmin and precip
-NOAA (https://psl.noaa.gov/enso/climaterisks/years/top24enso.html) - El Nino / La Nina
+https://origin.cpc.ncep.noaa.gov/products/analysis_monitoring/ensostuff/ONI_v5.php) - El Nino / La Nina
 National Park Service Streams Monitoring Protocol (NPS.GOV/SODN) - Seasonal Data
 
 
