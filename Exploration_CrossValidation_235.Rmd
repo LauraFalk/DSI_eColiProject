@@ -13,7 +13,6 @@ library(knitr)
 library(mlr)
 library(parallel)
 library(parallelMap)
-library(xgboost)
 #library(stackgbm)
 ```
 
@@ -264,6 +263,12 @@ xgpred2 <- predict(xgmodel2,testtask)
 confusionMatrix(xgpred2$data$response,xgpred2$data$truth)
 ```
 
+```{r}
+# The default is working better. LAURA look at this more. Until then, save the default model to work on the automation.
+#tidypredict_fit(finalmodel)
+xgb.save(finalmodel, "Data/Processed/XGBmodel.yml")
+
+```
 
 
 
