@@ -1,0 +1,73 @@
+---
+title: "Exploration_XGB_LOOCV"
+author: "Laura Palacios"
+date: "2022-11-23"
+output: html_document
+---
+
+## R Markdown
+
+```{r setup, include=FALSE}
+library(caret)
+library(knitr)
+library(xgboost)
+library(readr)
+library(dplyr)
+library(tidyr)
+
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+```{r}
+# Read in data
+ecoli_attr <- read.csv("Data/Processed/ecoli_attributed2.csv")
+
+# Partition the data to include only 236 e coli. 575 is column 10
+ecoli_235 <- ecoli_attr[,2:8]
+
+#make this example reproducible
+set.seed(5)
+
+#split into training (80%) and testing set (20%)
+parts <- createDataPartition(ecoli_235$ecoli_235, p = .7, list = F)
+
+train <- ecoli_235[parts, ]
+test <- ecoli_235[-parts, ]
+
+train_x <- data.matrix(train[, -7])
+train_y <- train[,7]
+
+test_x <- data.matrix(test[, -7])
+test_y <- test[, 7]
+```
+
+
+
+```{r}
+#https://www.machinelearningplus.com/machine-learning/caret-package/
+
+fitControl <- trainControl(
+    method = 'LOOCV',                   # k-fold cross validation
+    # number = 5,                      # number of folds
+    savePredictions = 'final',       # saves predictions for optimal tuning parameter
+    classProbs = T,                  # should class probabilities be returned
+    summaryFunction=twoClassSummary  # results summary function
+) 
+```
+
+```{r}
+modelLookup('xgbLinear')
+```
+
+
+```{r}
+# Step 1: Tune hyper parameters by setting tuneLength
+set.seed(1)
+model_loocv = train(ecoli_235 ~ ., data=train, method='xgbLinear', tuneLength = 5, metric='ROC')#, trControl = fitControl)
+model_loocv
+
+# Step 2: Predict on testData and Compute the confusion matrix
+predicted2 <- predict(model_loocv, test)
+confusionMatrix(reference = test$ecoli_235, data = test, mode='everything', positive='MM')
+```
+
