@@ -4,11 +4,15 @@ author: "Laura Palacios"
 date: '2022-11-13'
 output: html_document
 ---
-# Libraries
+
 ```{r setup, include=FALSE}
+# Libraries
 library(dataRetrieval)
 library(knitr)
+library(mapview)
+library(sf)
 library(tidyverse)
+library(xgboost)
 
 # Not currently on CRAN - devtools::install_github("scoyoc/climateAnalyzeR")
 library(climateAnalyzeR)
@@ -16,7 +20,9 @@ library(climateAnalyzeR)
 opts_chunk$set(echo = TRUE)
 ```
 
-# Read in the data
+## E. coli 235 Model {.tabset}
+
+### Model Processing
 
 I will need to read in:
 
@@ -27,9 +33,9 @@ I will need to read in:
 5. TOD (Use Current?)
 6. DistFromSonoita (Think about this one. Can I calc using latlong?) https://stackoverflow.com/questions/32363998/function-to-calculate-geospatial-distance-between-two-points-lat-long-using-r
 
-# Default values for data pulls - only need to do this once
+Default values for data pulls - only need to do this once
 
-```{r}
+```{r include=FALSE}
 # Find start and end dates to use for data pulls
 startDate <- Sys.Date() - 31
 endDate <- Sys.Date() - 1
@@ -38,7 +44,7 @@ endYear <- as.numeric(format(Sys.Date(), "%Y"))
 tz="America/Phoenix"
 ```
 
-# 1 - Previous T min (2 days prior). I need to lag this one more time in the processing due to the outputs of climate analyzer. This was previously used as the 30 day precipitation values, but the rain gage data is not trustworthy anymore due to birds and mowing vehicles.
+#### 1 - Previous T min (2 days prior). I need to lag this one more time in the processing due to the outputs of climate analyzer. This was previously used as the 30 day precipitation values, but the rain gage data is not trustworthy anymore due to birds and mowing vehicles.
 
 ```{r}
 # Pulls in current and 1 previous year's data (to account for January calcs)
@@ -56,7 +62,7 @@ Var_TMin <- as.numeric(unlist(Var_TMin))
 rm(TMin)
 ```
 
-# Discharge data
+#### 2 - Discharge data
 
 Use dataRetrieval to pull in the data from the USGS waterdata website.
 ```{r}
@@ -71,10 +77,9 @@ USGSRaw <- readNWISuv(site_id,c('00060','00065'), startDate,endDate, tz)
 
 Var_Discharge_CFS<- tail(USGSRaw$X_00060_00000, n=1)
 
-
 ```
 
-# Stage
+#### 3 - Stage
 ```{r}
 # Create quantiles for categorization
 CFS_Quantiles<- quantile(USGSRaw$X_00060_00000, na.rm = TRUE)
@@ -102,7 +107,7 @@ Var_Stage<- tail(USGSRaw$Stage, n=1)
 rm(USGSRaw)
 ```
 
-4. NinXTS (NOAA?)
+#### 4 - NinXTS
 ```{r}
 # Bring in the website data
 url <- "https://origin.cpc.ncep.noaa.gov/products/analysis_monitoring/ensostuff/ONI_v5.php"
@@ -127,8 +132,7 @@ rm(NinXTS, NinXTSRow, NinTable, NinText)
 ```
 
 
-5. TOD (Use Current?)
-
+#### 5 - TOD
 ```{r}
 #modified from https://stackoverflow.com/questions/49370387/convert-time-object-to-categorical-morning-afternoon-evening-night-variable
 
@@ -137,21 +141,75 @@ currenttime <- as.POSIXct(Sys.time(), format = "%H:%M") %>% format("%H:%M:%S")
 
 currenttime <- cut(chron::times(currenttime) , breaks = (1/24) * c(0,5,11,16,19,24))
 Var_TOD <- c(4, 1, 2, 3, 4)[as.numeric(currenttime)]
+```
+
+#### 6 - Distance from Sonoita - Roughly estimated linear distance from Sonoita input.
+
+Create the matrix to put through the model.
+```{r}
+spatiallocs <- read_sf("Data/Processed/Attributed_Location/ecoli_UniqueLocs.shp")
+
+spatialdf <- as.data.frame(spatiallocs)
+spatialdf$PreviousTmin <- c(Var_TMin)
+spatialdf$Discharge_CFS	<- c(Var_Discharge_CFS)
+spatialdf$Stage	<- c(Var_Stage)
+spatialdf$NinXTS	<- c(Var_NinXTS)
+spatialdf$TOD <- c(Var_TOD)
+
+spatialdf <- spatialdf %>%
+  rename(DistFromSonoita = DistCatego) %>%
+  select(PreviousTmin, Discharge_CFS, Stage, NinXTS, TOD, DistFromSonoita)
 
 ```
 
-6. DistFromSonoita (Think about this one. Can I calc using latlong?) Just use a lookup?
+This is pulled from the raw data. I should be able to attribute it with the rest of the information, run the model, and create a prediction for each spot. Maybe use green/red as the coloring?
 
 ```{r}
-library(mapview)
-library(sf)
-samplelocs <- read.csv("Data/Raw/ecoli_Locations_StoretandSODN.csv")
-
-samplelocs <- samplelocs %>%
-  select(c('OrganizationIdentifier', 'MonitoringLocationIdentifier', 'MonitoringLocationName', 'LatitudeMeasure', 'LongitudeMeasure'))
-
-spatiallocs <- read_sf("Data/Processed/ecoli_Locations_StoretandSODN_XYtableToPoint1.shp")
-
-mapview(samplelocs, xcol = "LatitudeMeasure", ycol = "LongituddeMeasure", zcol = "MonitoringLocationIdentifier")
+XGBModel <- xgb.load('Data/Processed/XGBmodel')
+spatialdf <- data.matrix(spatialdf)
+pred <- predict(XGBModel,spatialdf)
+pred <-  as.numeric(pred > 0.4)
+spatiallocs$pred2 <- c(pred)
+spatiallocs$pred <- ifelse(spatiallocs$pred2 > 0, "Bacteria Level >235  Likely", "High Bacteria levels > 235 not predicted")
+spatiallocs <- spatiallocs %>%
+  select(-DistCatego) %>%
+  rename(Samplers = Organiza_2, Prediction = pred)
 ```
+
+
+```{r}
+#XGB575Model <- xgb.load("Data/Processed/final575model")
+
+
+```
+
+
+
+### Plots
+```{r}
+mapview(spatiallocs, z = "Prediction", col.regions=list("red","blue"),col=list("red","blue"),layer.name = "Predictions")
+```
+
+```{r}
+library(leaflet)
+library(sp)
+
+ColorPal <- colorFactor(palette = c('Green', 'Red'), levels = c(0,1))
+
+m <- leaflet() %>%
+  addTiles() %>%  # Add default OpenStreetMap map tiles
+  addCircleMarkers(
+    data = spatiallocs
+    , popup = paste0( "Sampling Organization:"
+                 ,spatiallocs$Samplers
+                 , "<br>"
+                 , "test")
+    , color = ColorPal(spatiallocs$pred2)
+               )
+m  # Print the map
+```
+
+
+
+
 
