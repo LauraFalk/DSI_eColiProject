@@ -8,6 +8,7 @@ output: html_document
 ```{r setup, include=FALSE}
 # Libraries
 library(dataRetrieval)
+library(janitor)
 library(knitr)
 library(mapview)
 library(sf)
@@ -36,81 +37,93 @@ I will need to read in:
 Default values for data pulls - only need to do this once
 
 ```{r include=FALSE}
+
 # Find start and end dates to use for data pulls
 startDate <- Sys.Date() - 31
 endDate <- Sys.Date() - 1
-startYear <- as.numeric(format(Sys.Date(), "%Y"))-1
-endYear <- as.numeric(format(Sys.Date(), "%Y"))
-tz="America/Phoenix"
+sysDate1 <- Sys.Date()
+
 ```
 
 #### 1 - Previous T min (2 days prior). I need to lag this one more time in the processing due to the outputs of climate analyzer. This was previously used as the 30 day precipitation values, but the rain gage data is not trustworthy anymore due to birds and mowing vehicles.
 
 ```{r}
 # Pulls in current and 1 previous year's data (to account for January calcs)
-TMin <- climateAnalyzeR::import_data("daily_wx", station_id = 'KA7WSB-1', start_year = startYear, end_year = endYear, station_type = 'RAWS')
+get.Tmin <- function(sysDate) {
+  formattedEndYear <- as.numeric(format(sysDate, "%Y"))
+  TMin <- climateAnalyzeR::import_data("daily_wx"
+                                       , station_id = 'KA7WSB-1'
+                                       , start_year = formattedEndYear-1
+                                       , end_year = formattedEndYear
+                                       , station_type = 'RAWS')
+  
+  Var_TMin <- as.numeric(unlist(TMin %>%
+    mutate(DateasDate = as.POSIXct(TMin$date, format = "%m/%d/%Y")) %>%
+    subset(DateasDate == sysDate - 2) %>%
+    select(tmin_f)))
+}
 
-TMin$DateasDate <- as.POSIXct(TMin$date, format = "%m/%d/%Y", tz = tz)
+Var_TMin <- get.Tmin(sysDate1)
 
-
-Var_TMin <- TMin %>%
-  subset(DateasDate == endDate - 2) %>%
-  select(tmin_f)
-
-Var_TMin <- as.numeric(unlist(Var_TMin))
-
-rm(TMin)
 ```
 
 #### 2 - Discharge data
 
 Use dataRetrieval to pull in the data from the USGS waterdata website.
 ```{r}
-# Inputs formatted for read NWIS function.
-site_id <- '09481740'
+get.DischargeCFS <- function(sysDate) {
+  startDate <- sysDate - 31
+  endDate <- sysDate - 1
+  USGSRaw <- readNWISuv(siteNumbers = '09481740', c('00060','00065'), startDate,endDate, tz = 'America/Phoenix')
+  
+  tail(USGSRaw$X_00060_00000, n=1)
+}
 
-# Input timezone for read NWIS and POSIXT functions
-tz="America/Phoenix" 
-
-# Creates table in R
-USGSRaw <- readNWISuv(site_id,c('00060','00065'), startDate,endDate, tz)
-
-Var_Discharge_CFS<- tail(USGSRaw$X_00060_00000, n=1)
+Var_CFS <- get.DischargeCFS(sysDate1)
 
 ```
 
 #### 3 - Stage
 ```{r}
-# Create quantiles for categorization
-CFS_Quantiles<- quantile(USGSRaw$X_00060_00000, na.rm = TRUE)
+get.stage <- function(sysDate) {
+  startDate <- sysDate - 31
+  endDate <- sysDate - 1
+  USGSRaw <- readNWISuv(siteNumbers = '09481740', c('00060','00065'), startDate,endDate, tz = 'America/Phoenix')
 
-# Determine the difference between prior reading and current.
-USGSRaw <- USGSRaw %>% 
-  mutate(DisDif = X_00060_00000 - lag(X_00060_00000))
+  # Create quantiles for categorization
+  CFS_Quantiles<- quantile(USGSRaw$X_00060_00000, na.rm = TRUE)
 
-# This will create a binary variable or either rise of fall. Rise = 1, fall = 0. It will allow me to more easily create summary statistics.
-USGSRaw$DisDif2 <- ifelse(USGSRaw$DisDif>0,1,0)
+  # Determine the difference between prior reading and current.
+  USGSRaw <- USGSRaw %>% 
+    mutate(DisDif = X_00060_00000 - lag(X_00060_00000))
 
-# Create a numeric classifier. 
-# 1 = Low Flow, 2 = Base flow, 3 = High and Rising Flow 4 = High and Falling Flow
-USGSRaw$Stage <- ifelse(USGSRaw$X_00060_00000 <=CFS_Quantiles[2], 1, 
-  ifelse(USGSRaw$X_00060_00000 > CFS_Quantiles[2] & USGSRaw$X_00060_00000 <= CFS_Quantiles[4],2,
-  ifelse(USGSRaw$X_00060_00000 > CFS_Quantiles[4] & USGSRaw$DisDif2 == 1,3,
-  ifelse(USGSRaw$X_00060_00000 > CFS_Quantiles[4] & USGSRaw$DisDif2 == 0,4, NA))))
+  # This will create a binary variable or either rise of fall. Rise = 1, fall = 0. It will allow me to more easily create summary statistics.
+  USGSRaw$DisDif2 <- ifelse(USGSRaw$DisDif>0,1,0)
 
-# Remove fields with variables used for calculations
-rm(CFS_Quantiles)
+  # Create a numeric classifier. 
+  # 1 = Low Flow, 2 = Base flow, 3 = High and Rising Flow 4 = High and Falling Flow
+  USGSRaw$Stage <- ifelse(USGSRaw$X_00060_00000 <=CFS_Quantiles[2], 1, 
+    ifelse(USGSRaw$X_00060_00000 > CFS_Quantiles[2] & USGSRaw$X_00060_00000 <= CFS_Quantiles[4],2,
+    ifelse(USGSRaw$X_00060_00000 > CFS_Quantiles[4] & USGSRaw$DisDif2 == 1,3,
+    ifelse(USGSRaw$X_00060_00000 > CFS_Quantiles[4] & USGSRaw$DisDif2 == 0,4, NA))))
+
 
 # Create the stage variable.
-Var_Stage<- tail(USGSRaw$Stage, n=1)
+tail(USGSRaw$Stage, n=1)
+}
 
-rm(USGSRaw)
+Var_stage <- get.stage(sysDate1)
 ```
 
 #### 4 - NinXTS
 ```{r}
+get.NinXTS <- function(sysDate) {
+  formattedEndYear <- as.numeric(format(sysDate, "%Y"))
+  formattedMonth <- as.numeric(format(sysDate,"%m"))
+  
 # Bring in the website data
 url <- "https://origin.cpc.ncep.noaa.gov/products/analysis_monitoring/ensostuff/ONI_v5.php"
+
 NinXTS <- url %>%
   rvest::read_html()
 
@@ -118,16 +131,50 @@ NinXTS <- url %>%
 NinText <- rvest::html_table(rvest::html_nodes(NinXTS, xpath = './/table[4]//table[2]'))
 
 # Convert ONI index to dataframe
-NinTable <- as.data.frame(NinText[1])
+NinTable <- as.data.frame(NinText[1]) %>%
+  row_to_names(row_number = 1) %>%
+  mutate(Year = as.numeric(Year)) %>%
+  drop_na(Year)
 
-# Remove NA data from last row 
-NinXTSRow <- tail(NinTable, n = 1) %>%
-  select_if(~ !any(is.na(.)))
+# I need to do either month-of or last non-na value to account for delays. 
+formattedMonth <-12
 
-# Pull last reported value
-Var_NinXTS <- as.numeric(unlist(NinXTSRow[length(NinXTSRow)]))
+NinVal <- NinTable %>%
+  subset(2022 == Year) %>%
+  select(case_when(formattedMonth == 1 ~ "NDJ",
+                   formattedMonth == 2 ~ "DJF",
+                   formattedMonth == 3 ~ "JFM",
+                   formattedMonth == 4 ~ "FMA",
+                   formattedMonth == 5 ~ "MAM",
+                   formattedMonth == 6 ~ "AMJ",
+                   formattedMonth == 7 ~ "MJJ",
+                   formattedMonth == 8 ~ "JJA",
+                   formattedMonth == 9 ~ "JAS",
+                   formattedMonth == 10 ~ "ASO",
+                   formattedMonth == 11 ~ "SON",
+                   formattedMonth == 12 ~ "OND")) %>%
+  unlist()
 
-rm(NinXTS, NinXTSRow, NinTable, NinText)
+PrevVal <- NinTable %>%
+  subset(2022 == Year) %>%
+  select(case_when(formattedMonth == 2 ~ "NDJ",
+                   formattedMonth == 3 ~ "DJF",
+                   formattedMonth == 4 ~ "JFM",
+                   formattedMonth == 5 ~ "FMA",
+                   formattedMonth == 6 ~ "MAM",
+                   formattedMonth == 7 ~ "AMJ",
+                   formattedMonth == 8 ~ "MJJ",
+                   formattedMonth == 9 ~ "JJA",
+                   formattedMonth == 10 ~ "JAS",
+                   formattedMonth == 11 ~ "ASO",
+                   formattedMonth == 12 ~ "SON",
+                   formattedMonth == 1 ~ "OND")) %>%
+  unlist()
+
+if_else(!is.na(NinVal), NinVal, PrevVal)                 
+}
+
+nintest <- get.NinXTS(sysDate1)
 
 ```
 
@@ -190,6 +237,10 @@ spatiallocs <- spatiallocs %>%
 mapview(spatiallocs, z = "Prediction", col.regions=list("red","blue"),col=list("red","blue"),layer.name = "Predictions")
 ```
 
+
+
+
+
 ```{r}
 library(leaflet)
 library(sp)
@@ -200,10 +251,10 @@ m <- leaflet() %>%
   addTiles() %>%  # Add default OpenStreetMap map tiles
   addCircleMarkers(
     data = spatiallocs
-    , popup = paste0( "Sampling Organization:"
+    , popup = paste0( "Sampling Organization(s):"
                  ,spatiallocs$Samplers
                  , "<br>"
-                 , "test")
+                 ,spatiallocs$Prediction)
     , color = ColorPal(spatiallocs$pred2)
                )
 m  # Print the map

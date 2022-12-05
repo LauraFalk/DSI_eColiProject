@@ -23,6 +23,7 @@ knitr::opts_chunk$set(echo = TRUE)
 ecoli_attr <- read.csv("Data/Processed/ecoli_attributed2.csv")
 
 # Partition the data to include only 236 e coli. 575 is column 10
+ecoli_235$ecoli_235 <- as.factor(ecoli_235$ecoli_235)
 ecoli_235 <- ecoli_attr[,2:8]
 
 #make this example reproducible
@@ -63,11 +64,63 @@ modelLookup('xgbLinear')
 ```{r}
 # Step 1: Tune hyper parameters by setting tuneLength
 set.seed(1)
-model_loocv = train(ecoli_235 ~ ., data=train, method='xgbLinear', tuneLength = 5, metric='ROC')#, trControl = fitControl)
+# = train(ecoli_235 ~ .
+                    , data=train
+                    , method='xgbLinear'
+                    , tuneLength = 5
+                    , metric='RMSE'
+                    , classProbs = TRUE)
+                    #, trControl = fitControl)
 model_loocv
 
 # Step 2: Predict on testData and Compute the confusion matrix
 predicted2 <- predict(model_loocv, test)
 confusionMatrix(reference = test$ecoli_235, data = test, mode='everything', positive='MM')
+```
+
+```{r}
+# library(parallel)
+## Classification Example
+fitControl <- trainControl(method = "repeatedCV", number = 10, repeats = 2, search = "random")
+
+TestFit1 <- train(train_x
+                 , as.factor(train_y)
+                 , method = "xgbLinear"
+                 #, preProcess = c("center", "scale")
+                 #, tuneLength = 1
+                 , verbose = TRUE
+                 , trControl = fitControl)
+
+TestFit1$results
+```
+
+```{r}
+xgb_grid_1 <- expand.grid(
+  nrounds= 631,
+  lambda = 1,
+  alpha =0,
+  eta=c(0.01,0.001,0.0001)
+)
+
+xgb_trcontrol <- trainControl(
+  method="loocv",
+  number = 5,
+  verboseIter = TRUE,
+  returnData=FALSE,
+  returnResamp = "all",
+  allowParallel = TRUE,
+
+)
+
+xgb_train_1 <- train(
+  x = train_x,
+  y= as.factor(train_y),
+ trControl = xgb_trcontrol,
+ tuneGrid = xgb_grid_1,
+ method="xgbLinear"
+)
+
+xgb_train_1$results
+# nrounds 631, lambda 1 alpha 0 eta 1e-04 kappa 0, accuracy 86.7 
 ```
 
