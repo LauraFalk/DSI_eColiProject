@@ -213,6 +213,7 @@ testtask <- createDummyFeatures(obj = testtask)
 ```
 
 
+Tune the model
 ```{r}
 lrn <- makeLearner("classif.xgboost",
                    predict.type = "response")
@@ -228,8 +229,10 @@ params <- makeParamSet(#makeDiscreteParam("booster", values = c("gbtree","gbline
                        makeNumericParam("subsample",lower = 0.5,upper = 1),
                        makeNumericParam("colsample_bytree",lower = 0.5,upper = 1))
 
-rdesc <- makeResampleDesc("CV",stratify = T,iters=5L)
+rdesc <- makeResampleDesc("LOO")
+#rdesc <- makeResampleDesc("CV",stratify = T,iters=5L)
 
+# Maxint is 100 but this takes a long time. Leave at 10L until further notice
 ctrl <- makeTuneControlRandom(maxit = 10L)
 
  
