@@ -39,9 +39,7 @@ Default values for data pulls - only need to do this once
 ```{r include=FALSE}
 
 # Find start and end dates to use for data pulls
-startDate <- Sys.Date() - 31
-endDate <- Sys.Date() - 1
-sysDate1 <- Sys.Date()
+sysDate1 <- Sys.time()
 
 ```
 
@@ -59,7 +57,7 @@ get.Tmin <- function(sysDate) {
   
   Var_TMin <- as.numeric(unlist(TMin %>%
     mutate(DateasDate = as.POSIXct(TMin$date, format = "%m/%d/%Y")) %>%
-    subset(DateasDate == sysDate - 2) %>%
+    subset(DateasDate == as.Date(sysDate) - 2) %>%
     select(tmin_f)))
 }
 
@@ -72,22 +70,21 @@ Var_TMin <- get.Tmin(sysDate1)
 Use dataRetrieval to pull in the data from the USGS waterdata website.
 ```{r}
 get.DischargeCFS <- function(sysDate) {
-  startDate <- sysDate - 31
-  endDate <- sysDate - 1
+  startDate <- as.Date(format(sysDate1,'%Y-%m-%d')) - 31
+  endDate <- as.Date(format(sysDate1,'%Y-%m-%d')) - 1
   USGSRaw <- readNWISuv(siteNumbers = '09481740', c('00060','00065'), startDate,endDate, tz = 'America/Phoenix')
   
   tail(USGSRaw$X_00060_00000, n=1)
 }
 
-Var_CFS <- get.DischargeCFS(sysDate1)
-
+Var_Discharge_CFS <- get.DischargeCFS(sysDate1)
 ```
 
 #### 3 - Stage
 ```{r}
 get.stage <- function(sysDate) {
-  startDate <- sysDate - 31
-  endDate <- sysDate - 1
+  startDate <- as.Date(format(sysDate1,'%Y-%m-%d')) - 31
+  endDate <- as.Date(format(sysDate1,'%Y-%m-%d')) - 1
   USGSRaw <- readNWISuv(siteNumbers = '09481740', c('00060','00065'), startDate,endDate, tz = 'America/Phoenix')
 
   # Create quantiles for categorization
@@ -112,7 +109,7 @@ get.stage <- function(sysDate) {
 tail(USGSRaw$Stage, n=1)
 }
 
-Var_stage <- get.stage(sysDate1)
+Var_Stage <- get.stage(sysDate1)
 ```
 
 #### 4 - NinXTS
@@ -174,7 +171,7 @@ PrevVal <- NinTable %>%
 if_else(!is.na(NinVal), NinVal, PrevVal)                 
 }
 
-nintest <- get.NinXTS(sysDate1)
+Var_NinXTS <- get.NinXTS(sysDate1)
 
 ```
 
@@ -183,11 +180,17 @@ nintest <- get.NinXTS(sysDate1)
 ```{r}
 #modified from https://stackoverflow.com/questions/49370387/convert-time-object-to-categorical-morning-afternoon-evening-night-variable
 
+get.TOD <- function(sysTime) {
+
 # Create categorical variables
-currenttime <- as.POSIXct(Sys.time(), format = "%H:%M") %>% format("%H:%M:%S")
+currenttime <- as.POSIXct(sysTime, format = "%H:%M") %>% format("%H:%M:%S")
 
 currenttime <- cut(chron::times(currenttime) , breaks = (1/24) * c(0,5,11,16,19,24))
 Var_TOD <- c(4, 1, 2, 3, 4)[as.numeric(currenttime)]
+}
+
+
+Var_TOD <- get.TOD(sysDate1)
 ```
 
 #### 6 - Distance from Sonoita - Roughly estimated linear distance from Sonoita input.
@@ -196,14 +199,19 @@ Create the matrix to put through the model.
 ```{r}
 spatiallocs <- read_sf("Data/Processed/Attributed_Location/ecoli_UniqueLocs.shp")
 
-spatialdf <- as.data.frame(spatiallocs)
-spatialdf$PreviousTmin <- c(Var_TMin)
-spatialdf$Discharge_CFS	<- c(Var_Discharge_CFS)
-spatialdf$Stage	<- c(Var_Stage)
-spatialdf$NinXTS	<- c(Var_NinXTS)
-spatialdf$TOD <- c(Var_TOD)
+# Retrieve all variables using the functions
+sysDate1 <- Sys.time()
 
-spatialdf <- spatialdf %>%
+
+
+predictionDF <- as.data.frame(spatiallocs)
+predictionDF$PreviousTmin <- c(Var_TMin)
+predictionDF$Discharge_CFS	<- c(Var_Discharge_CFS)
+predictionDF$Stage	<- c(Var_Stage)
+predictionDF$NinXTS	<- c(Var_NinXTS)
+predictionDF$TOD <- c(Var_TOD)
+
+predictionDF <- predictionDF %>%
   rename(DistFromSonoita = DistCatego) %>%
   select(PreviousTmin, Discharge_CFS, Stage, NinXTS, TOD, DistFromSonoita)
 
@@ -213,8 +221,8 @@ This is pulled from the raw data. I should be able to attribute it with the rest
 
 ```{r}
 XGBModel <- xgb.load('Data/Processed/XGBmodel')
-spatialdf <- data.matrix(spatialdf)
-pred <- predict(XGBModel,spatialdf)
+predictionDM <- data.matrix(predictionDF)
+pred <- predict(XGBModel,predictioDM)
 pred <-  as.numeric(pred > 0.4)
 spatiallocs$pred2 <- c(pred)
 spatiallocs$pred <- ifelse(spatiallocs$pred2 > 0, "Bacteria Level >235  Likely", "High Bacteria levels > 235 not predicted")
