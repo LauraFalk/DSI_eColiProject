@@ -1,0 +1,285 @@
+---
+title: "Exploration_CrossValidation_TunedModels"
+author: "Laura Palacios"
+date: '2022-11-11'
+output: html_document
+---
+# Libraries
+```{r}
+library(caret)
+library(data.table)
+library(e1071)
+library(knitr)
+library(mlr)
+library(parallel)
+library(parallelMap)
+library(xgboost)
+#library(stackgbm)
+```
+# LAURA: Look at confidence intervals, maybe even down to 159 for 235 and ~380 for 575.
+
+# Basic XG model
+```{r}
+# Read in data
+ecoli_attr <- read.csv("Data/Processed/ecoli_attributed2.csv")
+
+# Partition the data to include only 236 e coli. 575 is column 10
+ecoli_235 <- ecoli_attr[,2:8]
+
+#make this example reproducible
+set.seed(5)
+
+#split into training (80%) and testing set (20%)
+parts <- createDataPartition(ecoli_235$ecoli_235, p = .7, list = F)
+
+train <- ecoli_235[parts, ]
+test <- ecoli_235[-parts, ]
+
+train_x <- data.matrix(train[, -7])
+train_y <- train[,7]
+
+test_x <- data.matrix(test[, -7])
+test_y <- test[, 7]
+
+# Find the model with the lowest log loss
+xgb_train <- xgb.DMatrix(data = train_x, label = train_y)
+xgb_test <- xgb.DMatrix(data = test_x, label = test_y)
+watchlist <- list(train=xgb_train, test=xgb_test)
+model <- xgb.train(data = xgb_train, max.depth = 5, watchlist=watchlist, nrounds = 100,objective = "binary:logistic")
+
+# Use those values ad the final nrounds values
+finalmodel <- xgboost(data = xgb_train, max.depth = 5, nrounds = 8, verbose = 0)
+
+set.seed(0)
+# Predict the new values
+pred <- predict(finalmodel, as.matrix(test_x))
+
+# Use 0.4 to favor decreasing the false negative results
+pred <-  as.numeric(pred > 0.4)
+
+# Create a confusion matrix of these values
+confusionMatrix(factor(pred),factor(test_y))
+```
+
+# Break the model
+
+Alter the previousTmin value to ensure that results will fail.
+previousTmin was chosen because it was the most strongly correlated to the test
+Chose to add 16 degrees to remain within reasonable temperature range (about 20 - 110 ish) but push up those lower values where e. coli does not thrive.
+```{r}
+test2 <- ecoli_235[-parts, ]
+test2$PreviousTmin <- test2$PreviousTmin + 16
+test_x2 <- data.matrix(test2[, -7])
+
+pred <- predict(finalmodel, as.matrix(test_x2))
+pred <-  as.numeric(pred > 0.5)
+confusionMatrix(factor(pred),factor(test_y))
+```
+
+# Break the model again
+
+Discharge value changed to reflect a different stage. Added 20 cfs so represent reasonably larger flow (but not flooding). Again, significantly decreased accuracy when discharge is low.
+````{r}
+# Bring the data back in since it was altered above
+test3 <- ecoli_235[-parts, ]
+test3$Discharge_CFS <- test3$Discharge_CFS + 20
+test_x3 <- data.matrix(test3[, -7])
+
+pred <- predict(finalmodel, as.matrix(test_x3))
+pred <-  as.numeric(pred > 0.5)
+confusionMatrix(factor(pred),factor(test_y))
+```
+
+# Break again ... again
+Just to ensure that it is behaving as expected despite the weirdly high accuracy.
+Temperature and discharge both altered means that the model can't figure anything out. 
+
+```{r}
+test4 <- ecoli_235[-parts, ]
+test4$PreviousTmin <- test4$PreviousTmin + 20
+test4$Discharge_CFS <- test4$Discharge_CFS + 40
+
+test_x4 <- data.matrix(test4[, -7])
+
+
+pred <- predict(finalmodel, as.matrix(test_x4))
+pred <-  as.numeric(pred > 0.5)
+confusionMatrix(factor(pred),factor(test_y))
+
+```
+
+
+# Cross validation of XGboost
+85% isn't so terrible.
+```{r}
+library(tidyverse)
+folds = createFolds(train_x, k = 10)
+cv <- lapply(folds, function(x) {
+  # Use the lowest log loss from the first chunk
+  classifier = xgboost(data = as.matrix(train_x), label = train_y, max.depth = 5, nrounds = 65, verbose = FALSE)
+  y_pred = predict(classifier, newdata = as.matrix(test_x)) # again need a matrix
+  y_pred = (y_pred >= 0.45) # here we are setting up the binary outcome of 0 or 1
+  cm = table(test_y, y_pred)
+  accuracy = (cm[1,1] + cm[2,2]) / (cm[1,1] + cm[2,2] + cm[1,2] + cm[2,1])
+  return(accuracy)
+})
+accuracy = mean(as.numeric(cv))
+print(accuracy)
+```
+
+Cross Validation of SVM
+# The cross validation indicates that the performance is mediocre even when using the python c and gamma values from Tousi's code.
+```{r}
+# This needs to be scaled.
+folds = createFolds(train_x, k = 10)
+cv <- lapply(folds, function(x) {
+  # Use the lowest log loss from the first chunk
+  classifier = svm(x = as.matrix(train_x), y = as.vector(train_y), type = 'C-classification', cost = 92.101, gamma=36.501)
+  y_pred = predict(classifier, newdata = as.matrix(test_x)) # again need a matrix
+  #y_pred = (y_pred >= 0.45) # here we are setting up the binary outcome of 0 or 1
+  cm = table(test_y, y_pred)
+  accuracy = (cm[1,1] + cm[2,2]) / (cm[1,1] + cm[2,2] + cm[1,2] + cm[2,1])
+  return(accuracy)
+})
+accuracy = mean(as.numeric(cv))
+print(accuracy)
+```
+# Hyperparameter tuning of XGB
+
+Followed the tutorial from https://www.hackerearth.com/practice/machine-learning/machine-learning-algorithms/beginners-tutorial-on-xgboost-parameter-tuning-r/tutorial/
+
+Create a model using default parameters
+```{r}
+# Create a model using the default parameters
+default_params <- list(booster = "gbtree",
+                       objective = "binary:logistic",
+                       eta=0.3,
+                       gamma=0,
+                       max_depth=6,
+                       min_child_weight=1,
+                       subsample=1,
+                       colsample_bytree=1)
+```
+
+Cross validation
+```{r}
+#train_matrix <- xgb.DMatrix(train_x)
+xgbcv <- xgb.cv(params = default_params,
+                data = train_x,
+                label=train_y,
+                nrounds = 100,
+                nfold = 5,
+                showsd = T,
+                stratified = T,
+                print_every_n = 10,
+                early_stopping_round = 20,
+                maximize = F)
+```
+
+Train and test the default model
+```{r}
+xgb1 <- xgb.train(params = default_params, 
+                  data = xgb_train,
+                  nrounds = 22, 
+                  watchlist = watchlist, 
+                  print_every_n = 10, 
+                  early_stopping_round = 5, 
+                  maximize = F, 
+                  eval_metric = "error")
+
+xgbpred <- predict(xgb1,test_x)
+xgbpred <- ifelse(xgbpred > 0.4,1,0)
+confusionMatrix(factor(xgbpred),factor(test_y))
+```
+
+Plot the variable importance used by the model. Previous tmin was known to be highly related to the values.
+```{r}
+mat <- xgb.importance(feature_names = colnames(train_x),model = xgb1)
+xgb.plot.importance(importance_matrix = mat[1:6]) 
+```
+Use MLR to tune further?
+
+Housekeeping for MLR
+```{r}
+train <- as.data.frame(train)
+test <- as.data.frame(test)
+
+#create tasks
+traintask <- makeClassifTask(data = train,target = "ecoli_235")
+testtask <- makeClassifTask(data = test,target = "ecoli_235")
+
+#do one hot encoding`<br/> 
+traintask <- createDummyFeatures(obj = traintask) 
+testtask <- createDummyFeatures(obj = testtask)
+```
+
+
+Tune the model
+```{r}
+lrn <- makeLearner("classif.xgboost",
+                   predict.type = "response")
+
+lrn$par.vals <- list(objective="binary:logistic", 
+                     eval_metric="error", 
+                     nrounds=100L, 
+                     eta=0.1)
+
+params <- makeParamSet(#makeDiscreteParam("booster", values = c("gbtree","gblinear")), 
+                       makeIntegerParam("max_depth",lower = 3L,upper = 5L),
+                       makeNumericParam("min_child_weight",lower = 1L,upper = 10L),
+                       makeNumericParam("subsample",lower = 0.5,upper = 1),
+                       makeNumericParam("colsample_bytree",lower = 0.5,upper = 1))
+
+rdesc <- makeResampleDesc("LOO")
+#rdesc <- makeResampleDesc("CV",stratify = T,iters=5L)
+
+# Maxint is 100 but this takes a long time. Leave at 10L until further notice
+ctrl <- makeTuneControlRandom(maxit = 10L)
+
+ 
+parallelStartSocket(cpus = detectCores())
+
+#parameter tuning
+mytune <- mlr::tuneParams(learner = lrn, task = traintask, resampling = rdesc, measures = acc, par.set = params, control = ctrl, show.info = T)
+mytune$y 
+
+```
+
+```{r}
+ctrl <- makeTuneControlRandom(maxit = 40L)
+
+mytune <- tuneParams(learner = lrn, task = traintask, resampling = rdesc, measures = acc, par.set = params, control = ctrl, show.info = T)
+
+mytune$y 
+
+```
+
+```{r}
+#set hyperparameters
+lrn_tune <- setHyperPars(lrn,par.vals = mytune$x)
+
+#train model
+xgmodel2 <- mlr::train(learner = lrn_tune,task = traintask)
+
+#predict model
+xgpred2 <- predict(xgmodel2,testtask)
+
+confusionMatrix(xgpred2$data$response,xgpred2$data$truth)
+```
+
+```{r}
+# The default is working better. LAURA look at this more. Until then, save the default model to work on the automation.
+#tidypredict_fit(finalmodel)
+xgb.save(finalmodel, "Data/Processed/XGBmodel235")
+
+```
+
+
+
+
+
+
+
+
+
+
